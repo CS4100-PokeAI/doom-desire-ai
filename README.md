@@ -1,3 +1,15 @@
+# CS4100: PokeAI
+
+
+#### Links
+
+##### [The Third Build](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q)
+
+- [How an A.I. is Becoming the World's Best Pokemon Player](https://www.youtube.com/watch?v=rhvj7CmTRkg&t=1129s&ab_channel=TheThirdBuild)
+- [I said some things wrong about my A.I.... Let's Fix That!](https://www.youtube.com/watch?v=RbBJ_J89wso&t=73s&ab_channel=TheThirdBuild)
+- [Why These Pokemon are an A.I.'s Biggest Threat](https://www.youtube.com/watch?v=vjQi8V96_FI)
+
+
 # The pokemon showdown Python environment
 
 [![PyPI version fury.io](https://badge.fury.io/py/poke-env.svg)](https://pypi.python.org/pypi/poke-env/)
