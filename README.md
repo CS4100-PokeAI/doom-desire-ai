@@ -3,7 +3,7 @@
 
 #### Links
 
-##### [The Third Build](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q)
+##### The Third Build ([YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q))
 
 - [How an A.I. is Becoming the World's Best Pokemon Player](https://www.youtube.com/watch?v=rhvj7CmTRkg&t=1129s&ab_channel=TheThirdBuild)
 - [I said some things wrong about my A.I.... Let's Fix That!](https://www.youtube.com/watch?v=RbBJ_J89wso&t=73s&ab_channel=TheThirdBuild)
