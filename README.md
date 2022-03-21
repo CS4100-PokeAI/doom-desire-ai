@@ -19,6 +19,10 @@
 - Can we take advantage of usage stats to predict what an opponent will have in terms of sets?
   - like at team preview we can narrow down what each mon likely has based on team composition
 - What other assumptions or guesses can we make to help the RL (and what might be over complicating it) like only checking min, max, and average damage rolls instead of all 16 (or maybe identifying "break points")
+- Look into the possibility of using different models for different phases of the game
+  - One for determining how to lead and maybe first turn (like for the Coalossal team that has set leads that are easily defineable), which would give time to initialize a model for the RL during the remainder of the time in team preview
+  - Reinforcement Learning model for main chunk of the game
+  - Some players noted that the AI did badly in the end game so possibly once a near win condition has been met let something else take over that plays towards that win condition
 
 ## Onboarding
 
