@@ -3,15 +3,18 @@
 ## TODO
 
 - [Onboarding](#onboarding)
+- 
+
+- Sample [teams](#teams) for VGC if thats what we're doing
 
 
 ## Onboarding
 
 Getting Familiar with The Problem
 
-- Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
-- Read some [articles](#articles) about the subject
-- 
+- Definantly watch videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
+- Read some [articles and papers](#articles-and-pages) about other attempts in the same realm
+- Check out some of the [repositories](#repositories) that we are using or are good references
 
 
 ## References
@@ -35,9 +38,24 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 
 ### Articles and Pages
 
+- vasumv/pokemon_ai on [Smogon](https://www.smogon.com/forums/threads/pokemon-showdown-ai-bot.3547689/) [Stunfisk Reddit](https://www.reddit.com/r/stunfisk/comments/3i4hww/pokemon_showdown_ai/) for [Github repo](#vasumv)
+- 
+- [Directory](https://coder.social/topic/pokemon-showdown-bot) of many different Pokemon Showdown bots that have been written 
+
+#### Academic Papers
+
+- [Showdown AI competition](https://ieeexplore.ieee.org/document/8080435)
+- [A Self-Play Policy Optimization Approach to Battling Pokémon](https://ieeexplore.ieee.org/document/8848014)
+- [Competitive Deep Reinforcement Learning over a Pokémon Battling Simulator](https://ieeexplore.ieee.org/document/9096092)
+- [VGC AI Competition - A New Model of Meta-Game Balance AI Competition](https://ieeexplore.ieee.org/document/9618985)
+- [The 2016 Two-Player GVGAI Competition](https://ieeexplore.ieee.org/document/8100955) (not actually about pokemon)
+- [Percymon: A Pokemon Showdown Artifical Intelligence](https://varunramesh.net/content/documents/cs221-final-report.pdf) for [Github repo](#rameshvarun-showdownbot)
+
 
 
 ### Repositories
+
+#### Using Directly
 
 #### Showdown
 
@@ -48,12 +66,48 @@ Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [De
   [3]: https://github.com/smogon/pokemon-showdown-client
   [4]: https://github.com/Zarel/Pokemon-Showdown-Dex
 
-Noteworthy Pages
+Noteworthy Pages:
 
 - [Custom Rules](https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md)
 - [Game Logging](https://github.com/smogon/pokemon-showdown/blob/master/logs/logging.md)
+- [Simulator](https://github.com/smogon/pokemon-showdown/blob/master/sim/SIMULATOR.md)
 
-#### CynthiAI
+##### poke-env
+
+[Github](https://github.com/hsahovic/poke-env)
+
+Noteworthy Pages:
+
+- [Project tracking](https://github.com/hsahovic/poke-env/projects) for [known issues](https://github.com/hsahovic/poke-env/projects/4) and [general](https://github.com/hsahovic/poke-env/projects/2)
+- [rl_with_open_ai_gym_wrapper](https://github.com/hsahovic/poke-env/blob/master/examples/rl_with_open_ai_gym_wrapper.py)
+- Certainly many more 
+
+#### Other Attempts
+
+##### pmariglia
+
+Has repositories for [Showdown Bot](https://github.com/pmariglia/showdown) and [poke-env](https://github.com/pmariglia/showdown)
+
+https://www.libhunt.com/r/pmariglia/showdown
+
+These seem to be the closest things to what we are trying to do and definetly need to be looked into deeper
+
+
+##### vasumv
+
+vasumv/pokemon_ai seems very promising as well
+
+- [Github](https://github.com/vasumv/pokemon_ai)
+
+
+##### rameshvarun showdownbot
+
+This one might be almost an exact copy, as it was also done for a class
+
+- [Github](https://github.com/rameshvarun/showdownbot)
+
+
+##### CynthiAI
 
 Similar seeming project but haven't looked into it
 
@@ -61,6 +115,25 @@ Looks like it doesn't work anymore but would have
 
 - [CynthiAI Github](https://github.com/Sisyphus25/CynthiAI)
 - [CynthiAgent.js](https://github.com/Sisyphus25/CynthiAI/blob/master/CynthiAgent.js) might have some things we can use
+
+
+##### taylorhansen pokemonshowdown-ai
+- [Github](https://github.com/taylorhansen/pokemonshowdown-ai)
+
+
+##### DeathlyPlays Pokemon-Showdown-Bot
+
+written in JavaScript for Node
+
+- [Github](https://github.com/DeathlyPlays/Pokemon-Showdown-Bot)
+
+
+
+### Teams
+
+Places from which we can grab good sample teams for the bots to use
+
+#### PokeAIM [website](https://www.pokeaimmd.com/teams)
 
 
 
