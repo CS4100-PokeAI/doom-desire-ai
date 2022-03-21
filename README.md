@@ -41,7 +41,15 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 
 #### Showdown (Github)[https://github.com/smogon/pokemon-showdown]
 
-- (Custom Rules)[https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md]
+Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex repository][3]
+
+  [1]: http://pokemonshowdown.com/
+  [2]: https://github.com/smogon/pokemon-showdown-client
+  [3]: https://github.com/Zarel/Pokemon-Showdown-Dex
+
+Noteworthy Pages
+
+- [Custom Rules](https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md)
 - 
 
 #### CynthiAI
@@ -51,7 +59,7 @@ Similar seeming project but haven't looked into it
 Looks like it doesn't work anymore but would have 
 
 - [CynthiAI Github](https://github.com/Sisyphus25/CynthiAI)
-- [CynthiAgent](https://github.com/Sisyphus25/CynthiAI/blob/master/CynthiAgent.js) might have some things we can use
+- [CynthiAgent.js](https://github.com/Sisyphus25/CynthiAI/blob/master/CynthiAgent.js) might have some things we can use
 
 
 
