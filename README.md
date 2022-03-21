@@ -1,33 +1,57 @@
 # CS4100: PokeAI
 
-### TODO
+## TODO
 
 - [Onboarding](#onboarding)
 
 
-### Onboarding
+## Onboarding
 
 Getting Familiar with The Problem
 
 - Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
+- Read some [articles](#articles) about the subject
+- 
 
 
-### References
+## References
 
-#### Videos
+### Videos
 
-###### The Third Build 
-([YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q))
+#### The Third Build 
+[Pokemon Battle Predictor Website](https://www.pokemonbattlepredictor.com/) and [Personal Website](https://aed3.github.io/)
+
+[YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q)
 
 - [How an A.I. is Becoming the World's Best Pokemon Player](https://www.youtube.com/watch?v=rhvj7CmTRkg&t=1129s&ab_channel=TheThirdBuild)
 - [I said some things wrong about my A.I.... Let's Fix That!](https://www.youtube.com/watch?v=RbBJ_J89wso&t=73s&ab_channel=TheThirdBuild)
 - [Why These Pokemon are an A.I.'s Biggest Threat](https://www.youtube.com/watch?v=vjQi8V96_FI)
 
-###### Rempton Games
+#### Rempton Games
 
 - [Programming AI for Pokemon Showdown + Bot Battle Royale!](https://youtu.be/C1KpQc9cWmM)
 
-#### Articles
+and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon-showdown-bot-battle-royale/), which used to be on [Game Developer](https://www.gamedeveloper.com/disciplines/programming-ai-for-pokemon-showdown-bot-battle-royale-) but link broke some time in March 2022
+
+### Articles and Pages
+
+
+
+### Repositories
+
+#### Showdown (Github)[https://github.com/smogon/pokemon-showdown]
+
+- (Custom Rules)[https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md]
+- 
+
+#### CynthiAI
+
+Similar seeming project but haven't looked into it
+
+Looks like it doesn't work anymore but would have 
+
+- [CynthiAI Github](https://github.com/Sisyphus25/CynthiAI)
+- [CynthiAgent](https://github.com/Sisyphus25/CynthiAI/blob/master/CynthiAgent.js) might have some things we can use
 
 
 
