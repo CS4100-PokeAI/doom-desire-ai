@@ -5,14 +5,14 @@
 - [Onboarding](#onboarding)
 - 
 
-- Sample [teams](#teams) for VGC if thats what we're doing
+- Sample [teams](#pokemon-resources) for VGC if thats what we're doing
 
 
 ## Onboarding
 
 Getting Familiar with The Problem
 
-- Definantly watch videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
+- Definantly watch videos from [The Third Build](#the-third-build-youtube) and [Rempton Games](#rempton-games)
 - Read some [articles and papers](#articles-and-pages) about other attempts in the same realm
 - Check out some of the [repositories](#repositories) that we are using or are good references
 
@@ -21,8 +21,8 @@ Getting Familiar with The Problem
 
 ### Videos
 
-#### The Third Build 
-[Pokemon Battle Predictor Website](https://www.pokemonbattlepredictor.com/) and [Personal Website](https://aed3.github.io/)
+#### The Third Build YouTube
+See more for [The Third Build](#the-third-build)
 
 [YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q)
 
@@ -38,8 +38,12 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 
 ### Articles and Pages
 
-- vasumv/pokemon_ai on [Smogon](https://www.smogon.com/forums/threads/pokemon-showdown-ai-bot.3547689/) [Stunfisk Reddit](https://www.reddit.com/r/stunfisk/comments/3i4hww/pokemon_showdown_ai/) for [Github repo](#vasumv)
+- [The Third Build](#the-third-build)
 - 
+- vasumv/pokemon_ai on [Smogon](https://www.smogon.com/forums/threads/pokemon-showdown-ai-bot.3547689/) [Stunfisk Reddit](https://www.reddit.com/r/stunfisk/comments/3i4hww/pokemon_showdown_ai/) for [Github repo](#vasumv)
+- [Poke-Agent: Pokemon Battling & Machine Learning](https://towardsdatascience.com/poke-agent-pokemon-battling-reinforcement-learning-27ef10885c5c), which uses Q-Learning
+- [THE QUEST TO MAKE AN AI THAT CAN PLAY COMPETITIVE POKÉMON](https://www.theverge.com/2021/12/2/22811849/pokemon-competitive-ai-nintendo-game-freak)
+- [Technical Machine](http://doublewise.net/pokemon/) an early attempt at a bot that did not do well (but impressive for 2010 using [Yomi layers](http://doublewise.net/pokemon/yomi.php))
 - [Directory](https://coder.social/topic/pokemon-showdown-bot) of many different Pokemon Showdown bots that have been written 
 
 #### Academic Papers
@@ -51,13 +55,28 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 - [The 2016 Two-Player GVGAI Competition](https://ieeexplore.ieee.org/document/8100955) (not actually about pokemon)
 - [Percymon: A Pokemon Showdown Artifical Intelligence](https://varunramesh.net/content/documents/cs221-final-report.pdf) for [Github repo](#rameshvarun-showdownbot)
 
+#### The Third Build
 
+[Personal Website](https://aed3.github.io/) for creator of Pokemon Battle Predictor and Future Sight AI
+
+[YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q) and [videos](#the-third-build-youtube)
+
+[Pokemon Battle Predictor Website](https://www.pokemonbattlepredictor.com/) 
+- [Battle Predictor](https://www.pokemonbattlepredictor.com/battle-predictor)
+  - Chrome extension tool does not seem to be working
+- [Future Sight AI](https://www.pokemonbattlepredictor.com/FSAI)
+  - [HOW FUTURE SIGHT AI WORKS](https://www.pokemonbattlepredictor.com/FSAI/how-fsai-works)
+  - [EXHIBITION STATS](https://www.pokemonbattlepredictor.com/FSAI/exhibition-stats)
+
+Some public extras on [Github](https://github.com/aed3/FSAI-Extras) for Future Sight AI (most of his code is private)
+
+- [How an A.I. is Becoming the World’s Best Pokemon Player](https://www.pokemoncrossroads.com/video-becoming-worlds-best-pokemon-player/)
 
 ### Repositories
 
 #### Using Directly
 
-#### Showdown
+##### Showdown
 
 Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [Dex repository][4]
 
@@ -71,16 +90,27 @@ Noteworthy Pages:
 - [Custom Rules](https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md)
 - [Game Logging](https://github.com/smogon/pokemon-showdown/blob/master/logs/logging.md)
 - [Simulator](https://github.com/smogon/pokemon-showdown/blob/master/sim/SIMULATOR.md)
+- [Bot F.A.Q.](https://gist.github.com/Kaiepi/becc5d0ecd576f5e7733b57b4e3fa97e)
 
 ##### poke-env
 
 [Github](https://github.com/hsahovic/poke-env)
 
-Noteworthy Pages:
+Noteworthy repo links:
 
 - [Project tracking](https://github.com/hsahovic/poke-env/projects) for [known issues](https://github.com/hsahovic/poke-env/projects/4) and [general](https://github.com/hsahovic/poke-env/projects/2)
 - [rl_with_open_ai_gym_wrapper](https://github.com/hsahovic/poke-env/blob/master/examples/rl_with_open_ai_gym_wrapper.py)
 - Certainly many more 
+
+###### [Docs](https://poke-env.readthedocs.io/en/stable/index.html)
+
+- [Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)
+- [Creating Agents](https://poke-env.readthedocs.io/en/stable/getting_started.html#creating-agents)
+- [Reinforcement learning with the OpenAI Gym wrapper](https://poke-env.readthedocs.io/en/stable/rl_with_open_ai_gym_wrapper.html#rl-with-open-ai-gym-wrapper)
+- [Adapting the max player to gen 8 OU and managing team preview](https://poke-env.readthedocs.io/en/stable/ou_max_player.html)
+- [Karas Docs](https://keras-rl.readthedocs.io/en/latest/agents/overview/)
+
+
 
 #### Other Attempts
 
@@ -129,11 +159,17 @@ written in JavaScript for Node
 
 
 
-### Teams
+### Pokemon Resources
+
+[Smogon Usage Stats](https://www.smogon.com/stats/)
+
+[Damage Calculator](https://calc.pokemonshowdown.com/) and its [Github repo](https://github.com/smogon/damage-calc)
+
+[Random Battles Competitive Guide](https://www.smogon.com/articles/randbats-guide-gen8) might have some tricks we can implement
 
 Places from which we can grab good sample teams for the bots to use
 
-#### PokeAIM [website](https://www.pokeaimmd.com/teams)
+#### PokeAIM Teams [website](https://www.pokeaimmd.com/teams)
 
 
 
