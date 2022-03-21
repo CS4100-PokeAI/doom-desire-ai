@@ -39,7 +39,7 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 
 ### Repositories
 
-#### Showdown (Github)[https://github.com/smogon/pokemon-showdown]
+#### Showdown
 
 Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [Dex repository][4]
 
@@ -51,7 +51,7 @@ Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [De
 Noteworthy Pages
 
 - [Custom Rules](https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md)
-- 
+- [Game Logging](https://github.com/smogon/pokemon-showdown/blob/master/logs/logging.md)
 
 #### CynthiAI
 
