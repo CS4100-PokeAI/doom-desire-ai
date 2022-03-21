@@ -7,7 +7,7 @@
 
 ### Getting Familiar with The Problem
 
-- Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#redepton-games)
+- Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
 
 
 ### References
