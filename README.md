@@ -3,10 +3,22 @@
 ## TODO
 
 - [Onboarding](#onboarding)
-- 
-
+- Get access to battle data (have reached out to showdown devs and TheThirdBuild)
+- Pick a format 
+  - not sure if I still love the idea of random battles because opponents back mons are hidden
+- starting to like the idea of doing VGC (official pokemon format where you pick 4 of the 6 from your team for a double battle)
+  - Singles battles often last 30 turns while VGC rarely get to 10 (often 6ish) (so less depth), but the action space becomes much bigger with 4 on the field at once (so branching factor increases dramatically)
+  - Have reached out to [WolfeyVGC](https://www.youtube.com/c/WolfeyVGC) for help on a "rules based" flowchart following bot
 - Sample [teams](#pokemon-resources) for VGC if thats what we're doing
-
+- How do we train using the complete games from Smogon logs?
+  - How do we remove certain conditions we don't want to worry about in our scenario? (like tossing any games with ditto)
+- Is there a way to weight the training by the ELO of the player (low ELO shows generally how people play but play like high ELO who make better decisions)
+- How close is [this](#rameshvarun-showdownbot) one to ours and how can we use that?
+  - might the similarities hurt us in some way
+- Can we make a "perfect information" that always knows opponents sets
+- Can we take advantage of usage stats to predict what an opponent will have in terms of sets?
+  - like at team preview we can narrow down what each mon likely has based on team composition
+- What other assumptions or guesses can we make to help the RL (and what might be over complicating it) like only checking min, max, and average damage rolls instead of all 16 (or maybe identifying "break points")
 
 ## Onboarding
 
@@ -16,6 +28,9 @@ Getting Familiar with The Problem
 - Read some [articles and papers](#articles-and-pages) about other attempts in the same realm
 - Check out some of the [repositories](#repositories) that we are using or are good references
 
+Then start with setting up the basic bots for poke-env ([Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)). After running these we will have a random agent, a non-trivial agent (max damage player), and a basic reinforcement learning agent.
+
+We will probably be good for Milestone 1 (Friday 3/25) if we get through this point and have started (though not quantifiably progressed with) next steps
 
 ## References
 
