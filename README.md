@@ -1,14 +1,31 @@
 # CS4100: PokeAI
 
+### TODO
 
-#### Links
+- 
 
-##### The Third Build ([YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q))
+
+### Getting Familiar with The Problem
+
+- Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#redepton-games)
+
+
+### References
+
+#### Videos
+
+###### The Third Build 
+([YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q))
 
 - [How an A.I. is Becoming the World's Best Pokemon Player](https://www.youtube.com/watch?v=rhvj7CmTRkg&t=1129s&ab_channel=TheThirdBuild)
 - [I said some things wrong about my A.I.... Let's Fix That!](https://www.youtube.com/watch?v=RbBJ_J89wso&t=73s&ab_channel=TheThirdBuild)
 - [Why These Pokemon are an A.I.'s Biggest Threat](https://www.youtube.com/watch?v=vjQi8V96_FI)
 
+###### Rempton Games
+
+- [Programming AI for Pokemon Showdown + Bot Battle Royale!](https://youtu.be/C1KpQc9cWmM)
+
+#### Articles
 
 
 
