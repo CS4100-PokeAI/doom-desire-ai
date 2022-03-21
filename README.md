@@ -69,7 +69,7 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 ## Articles and Pages
 
 - [The Third Build](#the-third-build)
-- [poke-env docs](#Docs)
+- [poke-env docs](#docs)
 - vasumv/pokemon_ai on [Smogon](https://www.smogon.com/forums/threads/pokemon-showdown-ai-bot.3547689/) [Stunfisk Reddit](https://www.reddit.com/r/stunfisk/comments/3i4hww/pokemon_showdown_ai/) for [Github repo](#vasumv)
 - [Poke-Agent: Pokemon Battling & Machine Learning](https://towardsdatascience.com/poke-agent-pokemon-battling-reinforcement-learning-27ef10885c5c), which uses Q-Learning
 - [THE QUEST TO MAKE AN AI THAT CAN PLAY COMPETITIVE POKÉMON](https://www.theverge.com/2021/12/2/22811849/pokemon-competitive-ai-nintendo-game-freak)
