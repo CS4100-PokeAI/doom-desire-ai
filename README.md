@@ -1,6 +1,6 @@
 # CS4100: PokeAI
 
-## TODO
+# TODO
 
 - [Onboarding](#onboarding)
 - Get access to battle data (have reached out to showdown devs and TheThirdBuild)
@@ -28,7 +28,7 @@
   - Maybe include the last 2 turns in this (or maybe use that greedy playout model to find the reward)
   - A reward only has to be calculated once for the entire game (or maybe the discounting happens based on the variance in that particular turn)
 
-## Onboarding
+# Onboarding
 
 Getting Familiar with The Problem
 
@@ -40,11 +40,14 @@ Then start with setting up the basic bots for poke-env ([Getting Started](https:
 
 We will probably be good for Milestone 1 (Friday 3/25) if we get through this point and have started (though not quantifiably progressed with) next steps
 
-## References
+# References
+
 
 ### Videos
 
-#### The Third Build YouTube
+---
+
+### The Third Build YouTube
 See more for [The Third Build](#the-third-build)
 
 [YouTube Channel](https://www.youtube.com/channel/UCdwshbwxNBoCCBoZGgf3U6Q)
@@ -53,23 +56,27 @@ See more for [The Third Build](#the-third-build)
 - [I said some things wrong about my A.I.... Let's Fix That!](https://www.youtube.com/watch?v=RbBJ_J89wso&t=73s&ab_channel=TheThirdBuild)
 - [Why These Pokemon are an A.I.'s Biggest Threat](https://www.youtube.com/watch?v=vjQi8V96_FI)
 
-#### Rempton Games
+---
+
+### Rempton Games
 
 - [Programming AI for Pokemon Showdown + Bot Battle Royale!](https://youtu.be/C1KpQc9cWmM)
 
 and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon-showdown-bot-battle-royale/), which used to be on [Game Developer](https://www.gamedeveloper.com/disciplines/programming-ai-for-pokemon-showdown-bot-battle-royale-) but link broke some time in March 2022
 
-### Articles and Pages
+---
+
+## Articles and Pages
 
 - [The Third Build](#the-third-build)
-- 
+- [poke-env docs](#Docs)
 - vasumv/pokemon_ai on [Smogon](https://www.smogon.com/forums/threads/pokemon-showdown-ai-bot.3547689/) [Stunfisk Reddit](https://www.reddit.com/r/stunfisk/comments/3i4hww/pokemon_showdown_ai/) for [Github repo](#vasumv)
 - [Poke-Agent: Pokemon Battling & Machine Learning](https://towardsdatascience.com/poke-agent-pokemon-battling-reinforcement-learning-27ef10885c5c), which uses Q-Learning
 - [THE QUEST TO MAKE AN AI THAT CAN PLAY COMPETITIVE POKÉMON](https://www.theverge.com/2021/12/2/22811849/pokemon-competitive-ai-nintendo-game-freak)
 - [Technical Machine](http://doublewise.net/pokemon/) an early attempt at a bot that did not do well (but impressive for 2010 using [Yomi layers](http://doublewise.net/pokemon/yomi.php))
 - [Directory](https://coder.social/topic/pokemon-showdown-bot) of many different Pokemon Showdown bots that have been written 
 
-#### Academic Papers
+### Academic Papers
 
 - [Showdown AI competition](https://ieeexplore.ieee.org/document/8080435)
 - [A Self-Play Policy Optimization Approach to Battling Pokémon](https://ieeexplore.ieee.org/document/8848014)
@@ -78,7 +85,9 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 - [The 2016 Two-Player GVGAI Competition](https://ieeexplore.ieee.org/document/8100955) (not actually about pokemon)
 - [Percymon: A Pokemon Showdown Artifical Intelligence](https://varunramesh.net/content/documents/cs221-final-report.pdf) for [Github repo](#rameshvarun-showdownbot)
 
-#### The Third Build
+---
+
+### The Third Build
 
 [Personal Website](https://aed3.github.io/) for creator of Pokemon Battle Predictor and Future Sight AI
 
@@ -95,11 +104,15 @@ Some public extras on [Github](https://github.com/aed3/FSAI-Extras) for Future S
 
 - [How an A.I. is Becoming the World’s Best Pokemon Player](https://www.pokemoncrossroads.com/video-becoming-worlds-best-pokemon-player/)
 
-### Repositories
+---
 
-#### Using Directly
+## Repositories
 
-##### Showdown
+### Using Directly
+
+---
+
+#### Showdown
 
 Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [Dex repository][4]
 
@@ -115,7 +128,9 @@ Noteworthy Pages:
 - [Simulator](https://github.com/smogon/pokemon-showdown/blob/master/sim/SIMULATOR.md)
 - [Bot F.A.Q.](https://gist.github.com/Kaiepi/becc5d0ecd576f5e7733b57b4e3fa97e)
 
-##### poke-env
+---
+
+#### poke-env
 
 [Github](https://github.com/hsahovic/poke-env)
 
@@ -125,7 +140,8 @@ Noteworthy repo links:
 - [rl_with_open_ai_gym_wrapper](https://github.com/hsahovic/poke-env/blob/master/examples/rl_with_open_ai_gym_wrapper.py)
 - Certainly many more 
 
-###### [Docs](https://poke-env.readthedocs.io/en/stable/index.html)
+
+##### [Docs](https://poke-env.readthedocs.io/en/stable/index.html)
 
 - [Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)
 - [Creating Agents](https://poke-env.readthedocs.io/en/stable/getting_started.html#creating-agents)
@@ -133,11 +149,13 @@ Noteworthy repo links:
 - [Adapting the max player to gen 8 OU and managing team preview](https://poke-env.readthedocs.io/en/stable/ou_max_player.html)
 - [Karas Docs](https://keras-rl.readthedocs.io/en/latest/agents/overview/)
 
+---
 
+### Other Attempts
 
-#### Other Attempts
+---
 
-##### pmariglia
+#### pmariglia
 
 Has repositories for [Showdown Bot](https://github.com/pmariglia/showdown) and [poke-env](https://github.com/pmariglia/showdown)
 
@@ -145,22 +163,33 @@ https://www.libhunt.com/r/pmariglia/showdown
 
 These seem to be the closest things to what we are trying to do and definetly need to be looked into deeper
 
+---
 
-##### vasumv
+#### vasumv
 
 vasumv/pokemon_ai seems very promising as well
 
 - [Github](https://github.com/vasumv/pokemon_ai)
 
+---
 
-##### rameshvarun showdownbot
+#### rameshvarun showdownbot
 
 This one might be almost an exact copy, as it was also done for a class
 
 - [Github](https://github.com/rameshvarun/showdownbot)
 
+---
 
-##### CynthiAI
+#### VGC AI Framework
+
+This one seems incredibly good, is for VGC, uses Gym OpenAI, and is regularly maintained (update just days ago)
+
+- [Gitlab](https://gitlab.com/DracoStriker/pokemon-vgc-engine)
+
+---
+
+#### CynthiAI
 
 Similar seeming project but haven't looked into it
 
@@ -169,20 +198,22 @@ Looks like it doesn't work anymore but would have
 - [CynthiAI Github](https://github.com/Sisyphus25/CynthiAI)
 - [CynthiAgent.js](https://github.com/Sisyphus25/CynthiAI/blob/master/CynthiAgent.js) might have some things we can use
 
+---
 
-##### taylorhansen pokemonshowdown-ai
+#### taylorhansen pokemonshowdown-ai
 - [Github](https://github.com/taylorhansen/pokemonshowdown-ai)
 
+---
 
-##### DeathlyPlays Pokemon-Showdown-Bot
+#### DeathlyPlays Pokemon-Showdown-Bot
 
 written in JavaScript for Node
 
 - [Github](https://github.com/DeathlyPlays/Pokemon-Showdown-Bot)
 
+---
 
-
-### Pokemon Resources
+## Pokemon Resources
 
 [Smogon Usage Stats](https://www.smogon.com/stats/)
 
