@@ -23,6 +23,10 @@
   - One for determining how to lead and maybe first turn (like for the Coalossal team that has set leads that are easily defineable), which would give time to initialize a model for the RL during the remainder of the time in team preview
   - Reinforcement Learning model for main chunk of the game
   - Some players noted that the AI did badly in the end game so possibly once a near win condition has been met let something else take over that plays towards that win condition
+- In training TheThirdBuild used each individual turn as their own episode and just used whether or not they won at the end of the game as the reward
+  - I like this approach in general but we can do better than just whether or not it was a win: points for guarenteed win condition (on last turn but possibly further back), possibly discount based on the number of high variance moves used (i.e. winning based on a last turn crit is not good)
+  - Maybe include the last 2 turns in this (or maybe use that greedy playout model to find the reward)
+  - A reward only has to be calculated once for the entire game (or maybe the discounting happens based on the variance in that particular turn)
 
 ## Onboarding
 
