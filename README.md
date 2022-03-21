@@ -2,10 +2,12 @@
 
 ### TODO
 
-- 
+- [Onboarding](#onboarding)
 
 
-### Getting Familiar with The Problem
+### Onboarding
+
+Getting Familiar with The Problem
 
 - Watch reference videos from [The Third Build](#the-third-build) and [Rempton Games](#rempton-games)
 
