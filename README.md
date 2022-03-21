@@ -41,11 +41,12 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 
 #### Showdown (Github)[https://github.com/smogon/pokemon-showdown]
 
-Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex repository][3]
+Navigation: [Website][1] | [Server repository][2] | [Client repository][3] | [Dex repository][4]
 
   [1]: http://pokemonshowdown.com/
-  [2]: https://github.com/smogon/pokemon-showdown-client
-  [3]: https://github.com/Zarel/Pokemon-Showdown-Dex
+  [2]: https://github.com/smogon/pokemon-showdown
+  [3]: https://github.com/smogon/pokemon-showdown-client
+  [4]: https://github.com/Zarel/Pokemon-Showdown-Dex
 
 Noteworthy Pages
 
