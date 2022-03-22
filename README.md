@@ -3,7 +3,7 @@
 # TODO
 
 - [Onboarding](#onboarding)
-- Get access to battle data (have reached out to showdown devs and TheThirdBuild) [same question on Showdown](https://www.smogon.com/forums/threads/availability-of-battle-logs-replays.3638716/)
+- Get access to battle data (have reached out to showdown devs and TheThirdBuild) [same question on Smogon](https://www.smogon.com/forums/threads/availability-of-battle-logs-replays.3638716/)
 - Pick a format 
   - not sure if I still love the idea of random battles because opponents back mons are hidden
 - starting to like the idea of doing VGC (official pokemon format where you pick 4 of the 6 from your team for a double battle)
