@@ -35,6 +35,7 @@ Getting Familiar with The Problem
 - Definantly watch videos from [The Third Build](#the-third-build-youtube) and [Rempton Games](#rempton-games)
 - Read some [articles and papers](#articles-and-pages) about other attempts in the same realm
 - Check out some of the [repositories](#repositories) that we are using or are good references
+- [github-how-to-make-a-fork-of-public-repository-private](https://stackoverflow.com/a/66406865) and [github-pull-request-from-private-to-public-repo-possible](https://stackoverflow.com/a/66414498)
 
 Then start with setting up the basic bots for poke-env ([Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)). After running these we will have a random agent, a non-trivial agent (max damage player), and a basic reinforcement learning agent.
 
