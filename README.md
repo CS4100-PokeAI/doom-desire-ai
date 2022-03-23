@@ -27,6 +27,7 @@
   - I like this approach in general but we can do better than just whether or not it was a win: points for guarenteed win condition (on last turn but possibly further back), possibly discount based on the number of high variance moves used (i.e. winning based on a last turn crit is not good)
   - Maybe include the last 2 turns in this (or maybe use that greedy playout model to find the reward)
   - A reward only has to be calculated once for the entire game (or maybe the discounting happens based on the variance in that particular turn)
+- Make the reward a function of the probability of the event(s) that let to the win (i.e. winning on a 70% accurate move could give only 70% of the reward that you would get from doing it with 100%)
 
 # Onboarding
 
