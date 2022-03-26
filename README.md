@@ -35,9 +35,6 @@ Getting Familiar with The Problem
 - Check out some of the [repositories](#repositories) that we are using or are good references
 - [github-how-to-make-a-fork-of-public-repository-private](https://stackoverflow.com/a/66406865) and [github-pull-request-from-private-to-public-repo-possible](https://stackoverflow.com/a/66414498)
 
-Then start with setting up the basic bots for poke-env ([Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)). After running these we will have a random agent, a non-trivial agent (max damage player), and a basic reinforcement learning agent.
-
-We will probably be good for Milestone 1 (Friday 3/25) if we get through this point and have started (though not quantifiably progressed with) next steps
 
 # References
 
