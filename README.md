@@ -3,7 +3,6 @@
 # TODO
 
 - [Onboarding](#onboarding)
-- Get access to battle data (have reached out to showdown devs and TheThirdBuild) [same question on Smogon](https://www.smogon.com/forums/threads/availability-of-battle-logs-replays.3638716/)
 - Pick a format 
   - not sure if I still love the idea of random battles because opponents back mons are hidden
 - starting to like the idea of doing VGC (official pokemon format where you pick 4 of the 6 from your team for a double battle)
@@ -13,10 +12,8 @@
 - How do we train using the complete games from Smogon logs?
   - How do we remove certain conditions we don't want to worry about in our scenario? (like tossing any games with ditto)
 - Is there a way to weight the training by the ELO of the player (low ELO shows generally how people play but play like high ELO who make better decisions)
-- How close is [this](#rameshvarun-showdownbot) one to ours and how can we use that?
-  - might the similarities hurt us in some way
-- Can we make a "perfect information" that always knows opponents sets
-- Can we take advantage of usage stats to predict what an opponent will have in terms of sets?
+- Can we make a "perfect information" bot that always knows opponents sets
+- Can we take advantage of usage stats to predict what an opponent will have in terms of sets? (and do we use those predictions as further features)
   - like at team preview we can narrow down what each mon likely has based on team composition
 - What other assumptions or guesses can we make to help the RL (and what might be over complicating it) like only checking min, max, and average damage rolls instead of all 16 (or maybe identifying "break points")
 - Look into the possibility of using different models for different phases of the game
