@@ -3,7 +3,6 @@
 # TODO
 
 - [Onboarding](#onboarding)
-- Get access to battle data (have reached out to showdown devs and TheThirdBuild) [same question on Smogon](https://www.smogon.com/forums/threads/availability-of-battle-logs-replays.3638716/)
 - Pick a format 
   - not sure if I still love the idea of random battles because opponents back mons are hidden
 - starting to like the idea of doing VGC (official pokemon format where you pick 4 of the 6 from your team for a double battle)
@@ -13,10 +12,8 @@
 - How do we train using the complete games from Smogon logs?
   - How do we remove certain conditions we don't want to worry about in our scenario? (like tossing any games with ditto)
 - Is there a way to weight the training by the ELO of the player (low ELO shows generally how people play but play like high ELO who make better decisions)
-- How close is [this](#rameshvarun-showdownbot) one to ours and how can we use that?
-  - might the similarities hurt us in some way
-- Can we make a "perfect information" that always knows opponents sets
-- Can we take advantage of usage stats to predict what an opponent will have in terms of sets?
+- Can we make a "perfect information" bot that always knows opponents sets
+- Can we take advantage of usage stats to predict what an opponent will have in terms of sets? (and do we use those predictions as further features)
   - like at team preview we can narrow down what each mon likely has based on team composition
 - What other assumptions or guesses can we make to help the RL (and what might be over complicating it) like only checking min, max, and average damage rolls instead of all 16 (or maybe identifying "break points")
 - Look into the possibility of using different models for different phases of the game
@@ -27,6 +24,7 @@
   - I like this approach in general but we can do better than just whether or not it was a win: points for guarenteed win condition (on last turn but possibly further back), possibly discount based on the number of high variance moves used (i.e. winning based on a last turn crit is not good)
   - Maybe include the last 2 turns in this (or maybe use that greedy playout model to find the reward)
   - A reward only has to be calculated once for the entire game (or maybe the discounting happens based on the variance in that particular turn)
+- Make the reward a function of the probability of the event(s) that let to the win (i.e. winning on a 70% accurate move could give only 70% of the reward that you would get from doing it with 100%)
 
 # Onboarding
 
@@ -35,10 +33,8 @@ Getting Familiar with The Problem
 - Definantly watch videos from [The Third Build](#the-third-build-youtube) and [Rempton Games](#rempton-games)
 - Read some [articles and papers](#articles-and-pages) about other attempts in the same realm
 - Check out some of the [repositories](#repositories) that we are using or are good references
+- [github-how-to-make-a-fork-of-public-repository-private](https://stackoverflow.com/a/66406865) and [github-pull-request-from-private-to-public-repo-possible](https://stackoverflow.com/a/66414498)
 
-Then start with setting up the basic bots for poke-env ([Getting Started](https://poke-env.readthedocs.io/en/stable/getting_started.html)). After running these we will have a random agent, a non-trivial agent (max damage player), and a basic reinforcement learning agent.
-
-We will probably be good for Milestone 1 (Friday 3/25) if we get through this point and have started (though not quantifiably progressed with) next steps
 
 # References
 
