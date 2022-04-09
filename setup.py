@@ -13,11 +13,11 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = "poke_env"
+NAME = "doom_desire"
 DESCRIPTION = """A python interface for training Reinforcement Learning bots to battle on pokemon showdown."""
-URL = "https://github.com/hsahovic/poke-env"
-EMAIL = "contact@sahovic.fr"
-AUTHOR = "Haris Sahovic"
+URL = "https://github.com/CS4100-PokeAI/doom-desire-ai"
+EMAIL = "jfenton888@github.com"
+AUTHOR = "Jack Fenton & Chris Sedayao"
 REQUIRES_PYTHON = ">=3.6.0"
 VERSION = "0.4.21"
 

@@ -4,3 +4,10 @@ orjson
 requests
 tabulate
 websockets>=8.0
+
+keras-rl2==1.0.3
+rl~=3.0
+
+dataclasses~=0.8
+tensorflow~=2.0.0b1
+setuptools~=59.6.0

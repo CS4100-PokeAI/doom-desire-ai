@@ -163,9 +163,9 @@ class EnvPlayer(Player, Env, ABC):  # pyre-ignore
 
         for _ in range(self.MAX_BATTLE_SWITCH_RETRY):
             battles = dict(self._actions.items())
-            battles = [b for b in battles if not b.finished]
-            if battles:
-                self._current_battle = battles[0]
+            battles_unfinished = [b for b in battles if not b.finished]
+            if battles_unfinished:
+                self._current_battle = battles_unfinished[0]
                 observation = self._observations[self._current_battle].get()
                 return observation
             time.sleep(self.PAUSE_BETWEEN_RETRIES)
@@ -293,7 +293,7 @@ class EnvPlayer(Player, Env, ABC):  # pyre-ignore
         :param action: The action to perform.
         :type action: int
         :return: A tuple containing the next observation, the reward, a boolean
-            indicating wheter the episode is finished, and additional information
+            indicating whether the episode is finished, and additional information
         :rtype: tuple
         """
         if self._current_battle.finished:

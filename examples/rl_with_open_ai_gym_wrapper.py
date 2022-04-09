@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     memory = SequentialMemory(limit=10000, window_length=1)
 
-    # Ssimple epsilon greedy
+    # Simple epsilon greedy
     policy = LinearAnnealedPolicy(
         EpsGreedyQPolicy(),
         attr="eps",
