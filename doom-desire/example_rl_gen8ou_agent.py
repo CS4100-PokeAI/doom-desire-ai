@@ -8,6 +8,7 @@ from tabulate import tabulate
 
 from doom_desire.env_algorithm.dnq_training import example_dqn_training, example_dqn_structure
 from doom_desire.env_algorithm.dqn_evaluation import example_dqn_evaluation
+from doom_desire.example_teams.gen8ou import RandomTeamFromPool, team_1, team_2
 from doom_desire.models.model_builder import ExampleSequentialModelBuilder
 from doom_desire.player.rl_player_examples import ExampleRLPlayer
 from poke_env.player.baselines import MaxBasePowerPlayer, SimpleHeuristicsPlayer
@@ -22,6 +23,8 @@ from poke_env.player.utils import background_evaluate_player, background_cross_e
 
 
 async def main():
+    custom_builder = RandomTeamFromPool([team_1, team_2])
+
     # Create one environment for training and one for evaluation
     opponent = RandomPlayer(battle_format="gen8randombattle")
     train_env = ExampleRLPlayer(
