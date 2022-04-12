@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module defines a base class for communicating with showdown servers.
 """
-
+import asyncio
 import json
 import logging
 import requests
@@ -20,6 +20,7 @@ from typing import Optional
 
 from logging import Logger
 from poke_env.exceptions import ShowdownException
+from poke_env.player.internals import POKE_LOOP
 from poke_env.player_configuration import PlayerConfiguration
 from poke_env.server_configuration import ServerConfiguration
 
@@ -61,14 +62,35 @@ class PlayerNetwork(ABC):
         self._username = player_configuration.username
         self._server_url = server_configuration.server_url
 
-        self._logged_in: Event = Event()
-        self._sending_lock = Lock()
+        self._logged_in: Event = self._create_class(Event)
+        self._sending_lock = self._create_class(Lock)
 
         self._websocket: websockets.client.WebSocketClientProtocol  # pyre-ignore
         self._logger: Logger = self._create_player_logger(log_level)
 
         if start_listening:
-            self._listening_coroutine = ensure_future(self.listen())
+            self._listening_coroutine = asyncio.run_coroutine_threadsafe(
+                self.listen(), POKE_LOOP
+            )
+
+    @staticmethod
+    def _create_class(cls, *args, **kwargs):  # pragma: no cover
+        if asyncio.get_event_loop() == POKE_LOOP:
+            return cls(*args, **kwargs)
+        else:
+            return asyncio.run_coroutine_threadsafe(
+                PlayerNetwork._create_class_async(cls, *args, **kwargs), POKE_LOOP
+            ).result()
+
+    @staticmethod
+    async def _create_class_async(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
+
+    @staticmethod
+    async def _handle_threaded_coroutines(coro):
+        task = asyncio.run_coroutine_threadsafe(coro, POKE_LOOP)
+        await asyncio.wrap_future(task)
+        return task.result()
 
     async def _accept_challenge(self, username: str) -> None:
         assert self.logged_in.is_set()
@@ -264,7 +286,10 @@ class PlayerNetwork(ABC):
         except Exception as e:
             self.logger.exception(e)
 
-    async def stop_listening(self) -> None:
+    async def stop_listening(self) -> None:  # pragma: no cover
+        await self._handle_threaded_coroutines(self._stop_listening())
+
+    async def _stop_listening(self) -> None:
         if self._listening_coroutine is not None:
             self._listening_coroutine.cancel()
         await self._websocket.close()

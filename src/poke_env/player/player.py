@@ -12,7 +12,9 @@ from asyncio import Condition
 from asyncio import Event
 from asyncio import Queue
 from asyncio import Semaphore
+from inspect import isawaitable
 from time import perf_counter
+from typing import Awaitable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -117,12 +119,14 @@ class Player(PlayerNetwork, ABC):
         self._start_timer_on_battle_start: bool = start_timer_on_battle_start
 
         self._battles: Dict[str, AbstractBattle] = {}
-        self._battle_semaphore: Semaphore = Semaphore(0)
+        self._battle_semaphore: Semaphore = self._create_class(Semaphore, 0)
 
-        self._battle_start_condition: Condition = Condition()
-        self._battle_count_queue: Queue = Queue(max_concurrent_battles)
-        self._battle_end_condition: Condition = Condition()
-        self._challenge_queue: Queue = Queue()
+        self._battle_start_condition: Condition = self._create_class(Condition)
+        self._battle_count_queue: Queue = self._create_class(
+            Queue, max_concurrent_battles
+        )
+        self._battle_end_condition: Condition = self._create_class(Condition)
+        self._challenge_queue: Queue = self._create_class(Queue)
 
         if isinstance(team, Teambuilder):
             self._team = team
@@ -318,7 +322,10 @@ class Player(PlayerNetwork, ABC):
                 return
             message = self.teampreview(battle)
         else:
-            message = self.choose_move(battle).message
+            message = self.choose_move(battle)
+            if isawaitable(message):
+                message = await message
+            message = message.message
 
         await self._send_message(message, battle.battle_tag)
 
@@ -364,6 +371,18 @@ class Player(PlayerNetwork, ABC):
         :param n_challenges: Number of challenges that will be accepted
         :type n_challenges: int
         """
+        await self._handle_threaded_coroutines(
+            self._accept_challenges(opponent, n_challenges)
+        )
+
+    async def _accept_challenges(
+        self, opponent: Optional[Union[str, List[str]]], n_challenges: int
+    ) -> None:  # pragma: no cover
+        if opponent:
+            if isinstance(opponent, list):
+                opponent = [to_id_str(o) for o in opponent]
+            else:
+                opponent = to_id_str(opponent)
         await self._logged_in.wait()
         self.logger.debug("Event logged in received in accept_challenge")
 
@@ -384,7 +403,9 @@ class Player(PlayerNetwork, ABC):
         await self._battle_count_queue.join()
 
     @abstractmethod
-    def choose_move(self, battle: AbstractBattle) -> BattleOrder:  # pragma: no cover
+    def choose_move(
+        self, battle: AbstractBattle
+    ) -> Union[BattleOrder, Awaitable[BattleOrder]]:  # pragma: no cover
         """Abstract method to choose a move in a battle.
 
         :param battle: The battle.
@@ -529,6 +550,9 @@ class Player(PlayerNetwork, ABC):
         :param n_games: Number of battles that will be played
         :type n_games: int
         """
+        await self._handle_threaded_coroutines(self._ladder(n_games))
+
+    async def _ladder(self, n_games):
         await self._logged_in.wait()
         start_time = perf_counter()
 
@@ -557,6 +581,11 @@ class Player(PlayerNetwork, ABC):
         :param n_battles: The number of games to play.
         :type n_battles: int
         """
+        await self._handle_threaded_coroutines(
+            self._battle_against(opponent, n_battles)
+        )
+
+    async def _battle_against(self, opponent: "Player", n_battles: int) -> None:
         await asyncio.gather(
             self.send_challenges(
                 to_id_str(opponent.username), n_battles, to_wait=opponent.logged_in
@@ -583,6 +612,13 @@ class Player(PlayerNetwork, ABC):
         :param to_wait: Optional event to wait before launching challenges.
         :type to_wait: Event, optional.
         """
+        await self._handle_threaded_coroutines(
+            self._send_challenges(opponent, n_challenges, to_wait)
+        )
+
+    async def _send_challenges(
+        self, opponent: str, n_challenges: int, to_wait: Optional[Event] = None
+    ) -> None:
         await self._logged_in.wait()
         self.logger.info("Event logged in received in send challenge")
 
