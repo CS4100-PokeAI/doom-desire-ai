@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-from keras.engine import training
-from tensorflow.python.keras.engine.sequential import Sequential
+from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Flatten
 
 
@@ -12,7 +11,7 @@ class ModelBuilder(ABC):
         self.layers: List[any] = []
 
     @abstractmethod
-    def build_model(self) -> training.Model:
+    def build_model(self):
         pass
 
     @abstractmethod
@@ -21,9 +20,14 @@ class ModelBuilder(ABC):
 
 class SequentialModelBuilder(ModelBuilder):
 
+    def add_layer(self) -> None:
+        pass
+
     def build_model(self) -> Sequential:
 
         return Sequential(self.layers)
+
+
 
 
 
