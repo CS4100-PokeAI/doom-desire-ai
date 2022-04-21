@@ -23,19 +23,19 @@ class EnvPlayer(OpenAIGymEnv, ABC):
     _DEFAULT_BATTLE_FORMAT = "gen8randombattle"
 
     def __init__(
-        self,
-        opponent: Optional[Union[Player, str]] = None,
-        player_configuration: Optional[PlayerConfiguration] = None,
-        *,
-        avatar: Optional[int] = None,
-        battle_format: Optional[str] = None,
-        log_level: Optional[int] = None,
-        save_replays: Union[bool, str] = False,
-        server_configuration: Optional[ServerConfiguration] = None,
-        start_listening: bool = True,
-        start_timer_on_battle_start: bool = False,
-        team: Optional[Union[str, Teambuilder]] = None,
-        start_challenging: bool = True,
+            self,
+            opponent: Optional[Union[Player, str]] = None,
+            player_configuration: Optional[PlayerConfiguration] = None,
+            *,
+            avatar: Optional[int] = None,
+            battle_format: Optional[str] = None,
+            log_level: Optional[int] = None,
+            save_replays: Union[bool, str] = False,
+            server_configuration: Optional[ServerConfiguration] = None,
+            start_listening: bool = True,
+            start_timer_on_battle_start: bool = False,
+            team: Optional[Union[str, Teambuilder]] = None,
+            start_challenging: bool = True,
     ):
         """
         :param opponent: Opponent to challenge. If empty, defaults to a RandomPlayer
@@ -79,7 +79,7 @@ class EnvPlayer(OpenAIGymEnv, ABC):
         b_format = self._DEFAULT_BATTLE_FORMAT
         if battle_format:
             b_format = battle_format
-        if not self.opponent:
+        if not self.opponent:  # if not explicitly given an opponent, make opponent a random player
             self.opponent = RandomPlayer(battle_format=b_format)
         super().__init__(
             player_configuration=player_configuration,
@@ -95,15 +95,15 @@ class EnvPlayer(OpenAIGymEnv, ABC):
         )
 
     def reward_computing_helper(
-        self,
-        battle: AbstractBattle,
-        *,
-        fainted_value: float = 0.0,
-        hp_value: float = 0.0,
-        number_of_pokemons: int = 6,
-        starting_value: float = 0.0,
-        status_value: float = 0.0,
-        victory_value: float = 1.0,
+            self,
+            battle: AbstractBattle,
+            *,
+            fainted_value: float = 0.0,
+            hp_value: float = 0.0,
+            number_of_pokemons: int = 6,
+            starting_value: float = 0.0,
+            status_value: float = 0.0,
+            victory_value: float = 1.0,
     ) -> float:
         """A helper function to compute rewards.
 
@@ -203,7 +203,7 @@ class EnvPlayer(OpenAIGymEnv, ABC):
             self.opponent = opponent
 
     def reset_env(
-        self, opponent: Optional[Union[Player, str]] = None, restart: bool = True
+            self, opponent: Optional[Union[Player, str]] = None, restart: bool = True
     ):  # pragma: no cover
         """
         Resets the environment to an inactive state: it will forfeit all unfinished
@@ -254,9 +254,9 @@ class Gen4EnvSinglePlayer(EnvPlayer, ABC):
         if action == -1:
             return ForfeitBattleOrder()
         elif (
-            action < 4
-            and action < len(battle.available_moves)
-            and not battle.force_switch
+                action < 4
+                and action < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(battle.available_moves[action])
         elif 0 <= action - 4 < len(battle.available_switches):
@@ -300,15 +300,15 @@ class Gen6EnvSinglePlayer(EnvPlayer, ABC):
         if action == -1:
             return ForfeitBattleOrder()
         elif (
-            action < 4
-            and action < len(battle.available_moves)
-            and not battle.force_switch
+                action < 4
+                and action < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(battle.available_moves[action])
         elif (
-            battle.can_mega_evolve
-            and 0 <= action - 4 < len(battle.available_moves)
-            and not battle.force_switch
+                battle.can_mega_evolve
+                and 0 <= action - 4 < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(
                 battle.available_moves[action - 4], mega=True
@@ -353,26 +353,26 @@ class Gen7EnvSinglePlayer(EnvPlayer, ABC):
         if action == -1:
             return ForfeitBattleOrder()
         elif (
-            action < 4
-            and action < len(battle.available_moves)
-            and not battle.force_switch
+                action < 4
+                and action < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(battle.available_moves[action])
         elif (
-            not battle.force_switch
-            and battle.can_z_move
-            and battle.active_pokemon
-            and 0
-            <= action - 4
-            < len(battle.active_pokemon.available_z_moves)  # pyre-ignore
+                not battle.force_switch
+                and battle.can_z_move
+                and battle.active_pokemon
+                and 0
+                <= action - 4
+                < len(battle.active_pokemon.available_z_moves)  # pyre-ignore
         ):
             return self.agent.create_order(
                 battle.active_pokemon.available_z_moves[action - 4], z_move=True
             )
         elif (
-            battle.can_mega_evolve
-            and 0 <= action - 8 < len(battle.available_moves)
-            and not battle.force_switch
+                battle.can_mega_evolve
+                and 0 <= action - 8 < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(
                 battle.available_moves[action - 8], mega=True
@@ -423,34 +423,34 @@ class Gen8EnvSinglePlayer(EnvPlayer, ABC):
         if action == -1:
             return ForfeitBattleOrder()
         elif (
-            action < 4
-            and action < len(battle.available_moves)
-            and not battle.force_switch
+                action < 4
+                and action < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(battle.available_moves[action])
         elif (
-            not battle.force_switch
-            and battle.can_z_move
-            and battle.active_pokemon
-            and 0
-            <= action - 4
-            < len(battle.active_pokemon.available_z_moves)  # pyre-ignore
+                not battle.force_switch
+                and battle.can_z_move
+                and battle.active_pokemon
+                and 0
+                <= action - 4
+                < len(battle.active_pokemon.available_z_moves)  # pyre-ignore
         ):
             return self.agent.create_order(
                 battle.active_pokemon.available_z_moves[action - 4], z_move=True
             )
         elif (
-            battle.can_mega_evolve
-            and 0 <= action - 8 < len(battle.available_moves)
-            and not battle.force_switch
+                battle.can_mega_evolve
+                and 0 <= action - 8 < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(
                 battle.available_moves[action - 8], mega=True
             )
         elif (
-            battle.can_dynamax
-            and 0 <= action - 12 < len(battle.available_moves)
-            and not battle.force_switch
+                battle.can_dynamax
+                and 0 <= action - 12 < len(battle.available_moves)
+                and not battle.force_switch
         ):
             return self.agent.create_order(
                 battle.available_moves[action - 12], dynamax=True

@@ -434,8 +434,10 @@ class OpenAIGymEnv(Env, ABC):  # pyre-ignore
                 time.sleep(self._TIME_BETWEEN_SWITCH_RETIRES)
         if not n_challenges:
             self._keep_challenging = True
+
         self.challenge_task = asyncio.run_coroutine_threadsafe(
-            self._challenge_loop(n_challenges, callback), POKE_LOOP
+            self._challenge_loop(n_challenges, callback),
+            POKE_LOOP
         )
 
     async def _ladder_loop(

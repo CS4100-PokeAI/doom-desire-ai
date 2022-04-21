@@ -6,7 +6,7 @@ import tensorflow as tf
 from gym.utils.env_checker import check_env
 from tabulate import tabulate
 
-from doom_desire.env_algorithm.dnq_training import example_dqn_training, example_dqn_structure
+from doom_desire.env_algorithm.dnq_training import example_dqn_structure
 from doom_desire.env_algorithm.dqn_evaluation import example_dqn_evaluation
 from doom_desire.example_teams.gen8ou import RandomTeamFromPool, team_1, team_2
 from doom_desire.models.model_builder import ExampleSequentialModelBuilder
@@ -27,13 +27,15 @@ async def main():
     custom_builder = RandomTeamFromPool([team_1])
 
     # Create one environment for training and one for evaluation
-    opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)
+    # opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)
+    train_opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
+
     train_env = ExampleRLPlayer(
-        battle_format="gen8ou", team=custom_builder, opponent=opponent, start_challenging=True
+        battle_format="gen8ou", team=custom_builder, opponent=train_opponent, start_challenging=True
     )
-    opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
+    eval_opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
     eval_env = ExampleRLPlayer(
-        battle_format="gen8ou", team=custom_builder, opponent=opponent, start_challenging=True
+        battle_format="gen8ou", team=custom_builder, opponent=eval_opponent, start_challenging=True
     )
 
     # Compute dimensions

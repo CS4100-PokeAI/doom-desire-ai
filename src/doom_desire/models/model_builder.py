@@ -37,9 +37,6 @@ class ExampleSequentialModelBuilder(SequentialModelBuilder):
 
         model = Sequential()
         model.add(Dense(128, activation="elu", input_shape=input_shape))
-
-        # Our embedding have shape (1, 10), which affects our hidden layer
-        # dimension and output dimension
         # Flattening resolve potential issues that would arise otherwise
         model.add(Flatten())
         model.add(Dense(64, activation="elu"))
