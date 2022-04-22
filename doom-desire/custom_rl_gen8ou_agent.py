@@ -37,19 +37,19 @@ async def main():
     config_defaults = {
         'NB_TRAINING_STEPS': 10000,
         'NB_EVALUATION_EPISODES': 100,
-        'first_layer_nodes': 128,   # 128       or 500
-        'second_layer_nodes': 64,   # 64        or 500
+        'first_layer_nodes': 256,   # 128       or 500
+        'second_layer_nodes': 128,   # 64        or 500
         'third_layer_nodes': -1,
         'gamma': 0.5,               # 0.5       or 0.99
         'delta_clip': .01,          # .01       or 0.9
         'target_model_update': 1,   # 1         or 10
-        'learning_rate': .00025,    # 0.00025   or 0.001
+        'learning_rate': .001,    # 0.00025   or 0.001
         'memory_limit': 100000,
         'warmup_steps': 1000,       # 1000      or 500
         'activation': "relu",        # "elu"     or "relu"
         'policy': 'EpsGreedyQPolicy',
         'team': 'swampert',
-        'opponent': 'all',
+        'opponent': 'rand',
         'opponent_team': 'swampert'
     }
 
@@ -82,7 +82,7 @@ async def main():
     # Create one environment for both training and evaluation
     training_agent = CustomRLPlayer(battle_format="gen8ou",
                                     config=config,
-                                    embedder=CustomEmbedder(),
+                                    embedder=SimpleEmbedder(),
                                     team=custom_builder,
                                     start_challenging=False)
     # training_agent.visualize_model()  # TODO: this doesn't work

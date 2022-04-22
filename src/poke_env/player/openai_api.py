@@ -75,6 +75,7 @@ class _AsyncPlayer(Player):
         return self.env_move(battle)
 
     async def env_move(self, battle: AbstractBattle):
+
         if not self.current_battle or self.current_battle.finished:
             self.current_battle = battle
         if not self.current_battle == battle:  # pragma: no cover
@@ -383,9 +384,9 @@ class OpenAIGymEnv(Env, ABC):  # pyre-ignore
             while self._keep_challenging:
                 opponent = self._get_opponent()
                 if isinstance(opponent, Player):
-                    await self.agent.battle_against(opponent, 1)
+                    await self.agent.battle_against(opponent, 1)  # if Player, opponent already exists, auto send-accept
                 elif isinstance(opponent, str):
-                    await self.agent.send_challenges(opponent, 1)
+                    await self.agent.send_challenges(opponent, 1)  # if str, they must be challenged
                 else:
                     raise ValueError(
                         f"Expected opponent of type List[Player] or string. "
