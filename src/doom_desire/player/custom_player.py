@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import numpy as np
 import tensorflow as tf
@@ -30,26 +30,24 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
 
     def __init__(
             self,
-            *,
+            battle_format: Optional[str] = None,
             config: wandb.wandb_sdk.Config = None,
             embedder: AbstractEmbedder = None,
-
+            *,
             player_configuration: Optional[PlayerConfiguration] = None,
             opponent: Optional[Union[Player, str]] = None,
             avatar: Optional[int] = None,
-            battle_format: Optional[str] = None,
             log_level: Optional[int] = None,
             save_replays: Union[bool, str] = False,
             server_configuration: Optional[ServerConfiguration] = None,
             start_listening: bool = True,
             start_timer_on_battle_start: bool = False,
             team: Optional[Union[str, Teambuilder]] = None,
-            start_challenging: bool = True,
+            start_challenging: bool = False,
     ):
-        self._embedder = embedder
+        self._config = config
 
-        if config:
-            self._config = config
+        self._embedder = embedder
 
         super().__init__(
             player_configuration=player_configuration,
@@ -64,22 +62,68 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             start_challenging=start_challenging,
         )
 
+        self._create_model()
+
     def _create_model(self):
-        """
-        model = tf.keras.models.Sequential()
-        model.add(Dense(config.first_layer_nodes, activation=config.activation, input_shape=env_player.embedding_space, kernel_initializer='he_uniform'))
-        model.add(Flatten())
-        if config.second_layer_nodes > 0: model.add(Dense(config.second_layer_nodes, activation=config.activation, kernel_initializer='he_uniform'))
-        if config.third_layer_nodes > 0: model.add(Dense(config.third_layer_nodes, activation=config.activation, kernel_initializer='he_uniform'))
-        model.add(BatchNormalization())
-        model.add(Dense(len(env_player._ACTION_SPACE), activation="linear"))
-        """
+
+        self._model = Sequential()
+        self._model.add(Dense(self._config.first_layer_nodes,  # 128
+                              activation="elu",
+                              input_shape=self._embedder.embedding_shape()))
+
+        # Flattening resolve potential issues that would arise otherwise
+        self._model.add(Flatten())
+        if self._config.second_layer_nodes > 0:
+            self._model.add(Dense(self._config.second_layer_nodes,  # 64
+                                  activation="elu"))
+
+        if self._config.third_layer_nodes > 0:
+            self._model.add(Dense(self._config.third_layer_nodes,
+                                  activation=self._config.activation,
+                                  kernel_initializer='he_uniform'))
+
+        self._model.add(Dense(units=self.action_space_size(), activation="linear"))
+
+        self._policy = None
+        if self._config.policy == 'MaxBoltzmannQPolicy':
+            self._policy = MaxBoltzmannQPolicy() # https://github.com/keras-rl/keras-rl/blob/master/rl/policy.py#L242
+        elif self._config.policy == 'EpsGreedyQPolicy':
+            self._policy = EpsGreedyQPolicy(eps=.1)
+        elif self._config.policy == 'LinearAnnealedPolicy':
+            self._policy = LinearAnnealedPolicy(
+                EpsGreedyQPolicy(),
+                attr="eps",
+                value_max=1.0,   # 1.0  or 0.5
+                value_min=0.05,  # 0.05 or 0.025
+                value_test=0,
+                nb_steps=self._config.NB_TRAINING_STEPS,
+            )
+
+        self._memory = SequentialMemory(limit=self._config.memory_limit,
+                                        window_length=1)
+
+        # Defining our DQN
+        self._dqn = DQNAgent(
+            model=self._model,
+            nb_actions=self.action_space_size(),
+            policy=self._policy,
+            memory=self._memory,
+            nb_steps_warmup=self._config.warmup_steps,  # 1000
+            gamma=self._config.gamma,  # 0.5
+            target_model_update=self._config.target_model_update,  # 1
+            delta_clip=self._config.delta_clip,  # 0.01
+            enable_double_dqn=True,
+        )
+        self._dqn.compile(Adam(learning_rate=self._config.learning_rate),
+                          metrics=["mae"])  # learning_rate=0.00025
+
 
         # Simple model where only one layer feeds into the next
+        """
         self._model = Sequential()
         self._model.add(Dense(self._config.first_layer_nodes,
                               activation=self._config.activation,
-                              input_shape=self.embedding_space,
+                              input_shape=self._embedder.embedding_shape(),
                               kernel_initializer='he_uniform'))
         self._model.add(Flatten())
         if self._config.second_layer_nodes > 0:
@@ -115,7 +159,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         # Defining our DQN
         self._dqn = DQNAgent(
             model=self._model,
-            nb_actions=len(self._ACTION_SPACE),
+            nb_actions=self.action_space_size(),
             policy=self._policy,
             memory=self._memory,
             nb_steps_warmup=self._config.warmup_steps,
@@ -126,12 +170,13 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         )
 
         self._dqn.compile(
-            tf.keras.optimizers.Adam(lr=self._config.lr),
+            tf.keras.optimizers.Adam(lr=self._config.learning_rate),
             metrics=[
                 tf.keras.metrics.MeanSquaredError(),
                 tf.keras.metrics.MeanAbsoluteError(),
             ]
         )
+        """
 
         # # Get initializer for hidden layers
         # init = tf.keras.initializers.RandomNormal(mean=.1, stddev=.02)
@@ -229,8 +274,25 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
     def describe_embedding(self) -> Space:
         return self._embedder.describe_embedding()
 
+    def set_opponent(self, opponent: Union[Player, str, List[Player], List[str]]):
+        """
+        Sets the next opponent to the specified opponent.
+
+        :param opponent: The next opponent to challenge
+        :type opponent: Player or str or a list of these
+        """
+        if isinstance(opponent, list):
+            for i_opponent in opponent:
+                if not isinstance(i_opponent, Player) and not isinstance(i_opponent, str):
+                    raise RuntimeError(f"Expected type Player or str. Got {type(opponent)}")
+        else:
+            if not isinstance(opponent, Player) and not isinstance(opponent, str):
+                raise RuntimeError(f"Expected type Player or str. Got {type(opponent)}")
+        with self.opponent_lock:
+            self.opponent = opponent
+
     # TODO: Test this
-    def train(self, opponent: Player, num_steps: int) -> None:
+    def train(self, opponent: Union[Player, str, List[Player], List[str]], num_steps: int) -> None:
 
         self.set_opponent(opponent)
         self.start_challenging()
@@ -238,10 +300,10 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
 
 
     # TODO: test this
-    def evaluate_model(self, num_battles: int, v=True) -> float:
+    def evaluate_model(self, num_battles: int, visualize=False, verbose=False, verbose_end=False) -> float:
         self.reset_battles()
-        self._dqn.test(env=self, nb_episodes=num_battles, visualize=False, verbose=False)
-        if v: print("DQN Evaluation: %d wins out of %d battles" % (self.n_won_battles, num_battles))
+        self._dqn.test(env=self, nb_episodes=num_battles, visualize=visualize, verbose=verbose)
+        if verbose_end: print("DQN Evaluation: %d wins out of %d battles" % (self.n_won_battles, num_battles))
         return self.n_won_battles * 1. / num_battles
 
 
