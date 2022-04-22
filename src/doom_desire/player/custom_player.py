@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import Optional, Union, List
 
-import numpy as np
-import tensorflow as tf
 import wandb as wandb
 from gym import Space
+from tensorflow.python import keras
 from wandb.keras import WandbCallback
 
-from doom_desire.helpers.abstract_embedder import AbstractEmbedder
+from doom_desire.embed.abstract_embedder import AbstractEmbedder
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.env_player import Gen8EnvSinglePlayer
 from poke_env.player.openai_api import ObservationType
@@ -21,7 +20,7 @@ from rl.policy import LinearAnnealedPolicy, MaxBoltzmannQPolicy, Policy, EpsGree
 from tensorflow.python.keras.engine import training
 from rl.memory import SequentialMemory, Memory
 
-from tensorflow.keras.layers import Dense, Flatten, Activation, BatchNormalization, Input
+from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 
@@ -294,6 +293,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
     # TODO: Test this
     def train(self, opponent: Union[Player, str, List[Player], List[str]], num_steps: int) -> None:
 
+        self._model.summary()
+
         self.set_opponent(opponent)
         self.start_challenging()
         self._dqn.fit(env=self, nb_steps=num_steps, callbacks=[WandbCallback()])
@@ -315,3 +316,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
 
     def load_model(self, filename: str) -> None:
         self._dqn.load_weights("models/" + filename)
+
+    def visualize_model(self):  # TODO: Does not work due to some issue with Graphviz and pydot
+        keras.utils.plot_model(self._model, "model_visualization.png", show_shapes=True)
+

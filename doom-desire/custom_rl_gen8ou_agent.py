@@ -1,28 +1,15 @@
 # -*- coding: utf-8 -*-
 import asyncio
 
-import numpy as np
-import tensorflow as tf
 import wandb
-from gym.utils.env_checker import check_env
-from tabulate import tabulate
 
-from doom_desire.env_algorithm.dnq_training import example_dqn_structure
-from doom_desire.env_algorithm.dqn_evaluation import example_dqn_evaluation
+from doom_desire.embed.custom_embedder import CustomEmbedder
 from doom_desire.example_teams.gen8ou import RandomTeamFromPool, team_1, team_2
-from doom_desire.helpers.simple_embedder import SimpleEmbedder
-from doom_desire.models.model_builder import ExampleSequentialModelBuilder
+from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.player.custom_player import CustomRLPlayer
-from doom_desire.player.rl_player_examples import ExampleRLPlayer
 from poke_env.player.baselines import MaxBasePowerPlayer, SimpleHeuristicsPlayer
 from poke_env.player.random_player import RandomPlayer
 
-from rl.agents.dqn import DQNAgent
-from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
-from rl.memory import SequentialMemory
-from tensorflow.keras.optimizers import Adam
-
-from poke_env.player.utils import background_evaluate_player, background_cross_evaluate
 
 # Defaults taken from reuniclusVGC
 # config_defaults = {
@@ -59,18 +46,16 @@ async def main():
         'learning_rate': .00025,    # 0.00025   or 0.001
         'memory_limit': 100000,
         'warmup_steps': 1000,       # 1000      or 500
-        'activation': "elu",        # "elu"     or "relu"
+        'activation': "relu",        # "elu"     or "relu"
         'policy': 'EpsGreedyQPolicy',
         'team': 'swampert',
-        'opponent': 'rand-max',
+        'opponent': 'all',
         'opponent_team': 'swampert'
     }
 
     # Initialize a new wandb run; We can use os.environ['WANDB_MODE'] = 'dryrun' to not save wandb to cloud
     wandb.init(config=config_defaults, entity="jfenton888", project="doom-desire-ai_DQN")
     config = wandb.config
-
-    embedder = SimpleEmbedder()
 
     # custom_builder = RandomTeamFromPool([team_1, team_2])
     custom_builder = RandomTeamFromPool([team_1, team_2])
@@ -86,15 +71,21 @@ async def main():
         # Each battle is going to be against either a random player or a max base power player
         training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
                              MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)]
+    elif config.opponent == 'all':
+        # Each battle is going to be against either a random player or a max base power player
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
+                             MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
 
 
 
     # Create one environment for both training and evaluation
     training_agent = CustomRLPlayer(battle_format="gen8ou",
                                     config=config,
-                                    embedder=embedder,
+                                    embedder=CustomEmbedder(),
                                     team=custom_builder,
                                     start_challenging=False)
+    # training_agent.visualize_model()  # TODO: this doesn't work
     # Train the agent against the opponent for num_steps
     training_agent.train(training_opponent, num_steps=config.NB_TRAINING_STEPS)
 

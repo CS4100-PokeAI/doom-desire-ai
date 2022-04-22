@@ -953,6 +953,19 @@ class AbstractBattle(ABC):
             return {mon.species: mon for mon in self._teampreview_opponent_team}
 
     @property
+    def teampreview_opponent_team(self) -> Dict[str, Pokemon]:
+        """
+        During teampreview, keys are not definitive: please rely on values; self.team
+        only stores what we currently know of an opponent's team, which is little in
+        some cases in VGC; this property returns everything we see in team preview.
+
+        :return: The opponent's full team. Keys are identifiers, values are pokemon objects.
+            This includes all mons that are possible
+        :rtype: Dict[str, Pokemon]
+        """
+        return {mon.species: mon for mon in self._teampreview_opponent_team}
+
+    @property
     def opponent_username(self) -> Optional[str]:
         """
         :return: The opponent's username, or None if unknown.

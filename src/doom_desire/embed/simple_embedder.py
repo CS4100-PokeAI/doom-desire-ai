@@ -1,11 +1,10 @@
-from abc import ABC, abstractmethod
 from typing import Tuple
 
 import numpy as np
 from gym import Space
 from gym.spaces import Box
 
-from doom_desire.helpers.abstract_embedder import AbstractEmbedder
+from doom_desire.embed.abstract_embedder import AbstractEmbedder
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.openai_api import ObservationType
 

@@ -1,11 +1,10 @@
-import sys
-from typing import Dict, List, Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 from gym import Space
 from gym.spaces import Box
 
-from doom_desire.helpers.abstract_embedder import AbstractEmbedder
+from doom_desire.embed.abstract_embedder import AbstractEmbedder
 from poke_env.data import GEN_TO_MOVES, GEN_TO_POKEDEX
 from poke_env.environment.field import Field
 from poke_env.environment.side_condition import SideCondition
@@ -15,8 +14,8 @@ from poke_env.environment.pokemon_type import PokemonType
 from poke_env.environment.move_category import MoveCategory
 from poke_env.environment.target_type import TargetType
 from poke_env.environment.volatile_status import VolatileStatus
-from poke_env.environment.battle import Battle
-from poke_env.player.battle_order import *
+
+
 # from reuniclusVGC.helpers.doubles_utils import *
 
 class DoublesEmbedder(AbstractEmbedder):
