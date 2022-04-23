@@ -7,6 +7,7 @@ from tensorflow.python import keras
 from wandb.keras import WandbCallback
 
 from doom_desire.embed.abstract_embedder import AbstractEmbedder
+from doom_desire.helpers.reward_calculator import RewardCalculator
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.env_player import Gen8EnvSinglePlayer
 from poke_env.player.openai_api import ObservationType
@@ -32,6 +33,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             battle_format: Optional[str] = None,
             config: wandb.wandb_sdk.Config = None,
             embedder: AbstractEmbedder = None,
+            reward_calculator: RewardCalculator = None,
             *,
             player_configuration: Optional[PlayerConfiguration] = None,
             opponent: Optional[Union[Player, str]] = None,
@@ -47,6 +49,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         self._config = config
 
         self._embedder = embedder
+
+        self._reward_calculator = reward_calculator
 
         super().__init__(
             player_configuration=player_configuration,
@@ -113,9 +117,11 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             delta_clip=self._config.delta_clip,  # 0.01
             enable_double_dqn=True,
         )
-        self._dqn.compile(Adam(learning_rate=self._config.learning_rate),
-                          metrics=["mae"])  # learning_rate=0.00025
-
+        self._dqn.compile(Adam(learning_rate=self._config.learning_rate),  # learning_rate=0.00025
+                          metrics=['mean_squared_error',
+                                   'mean_absolute_error',
+                                   'mean_absolute_percentage_error',
+                                   'cosine_proximity'])
 
         # Simple model where only one layer feeds into the next
         """
@@ -262,10 +268,20 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         """
         return self._dqn
 
-    def calc_reward(self, last_battle, current_battle) -> float:
-        return self.reward_computing_helper(
-            current_battle, fainted_value=2.0, hp_value=1.0, victory_value=30.0
-        )
+    def calc_reward(self,
+                    last_battle: AbstractBattle,
+                    current_battle: AbstractBattle
+                    ) -> float:
+
+        if current_battle not in self._reward_buffer:
+            self._reward_buffer[current_battle] = self._reward_calculator._starting_value
+
+        current_value = self._reward_calculator.calc_reward(battle=current_battle)
+
+        to_return = current_value - self._reward_buffer[current_battle]
+        self._reward_buffer[current_battle] = current_value
+
+        return to_return
 
     def embed_battle(self, battle: AbstractBattle) -> ObservationType:
         return self._embedder.embed_battle(battle)
@@ -291,19 +307,37 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             self.opponent = opponent
 
     # TODO: Test this
-    def train(self, opponent: Union[Player, str, List[Player], List[str]], num_steps: int) -> None:
+    def train(
+            self,
+            opponent: Union[Player, str, List[Player], List[str]],
+            num_steps: int,
+            in_order: Optional[bool]=False) -> None:
 
         self._model.summary()
 
+        if in_order:
+            for single_opponent in opponent:
+                self._train_helper(single_opponent, num_steps)
+        else:
+            self._train_helper(opponent, num_steps)
+
+    def _train_helper(
+            self,
+            opponent: Union[Player, str, List[Player], List[str]],
+            num_steps: int):
+
         self.set_opponent(opponent)
-        self.start_challenging()
+        if not self.challenge_task:  # haven't already started challenging opponents
+            self.start_challenging()
         self._dqn.fit(env=self, nb_steps=num_steps, callbacks=[WandbCallback()])
+
+
 
 
     # TODO: test this
     def evaluate_model(self, num_battles: int, visualize=False, verbose=False, verbose_end=False) -> float:
         self.reset_battles()
-        self._dqn.test(env=self, nb_episodes=num_battles, visualize=visualize, verbose=verbose)
+        self._dqn.test(env=self, nb_episodes=num_battles, verbose=verbose, visualize=visualize)
         if verbose_end: print("DQN Evaluation: %d wins out of %d battles" % (self.n_won_battles, num_battles))
         return self.n_won_battles * 1. / num_battles
 
@@ -312,7 +346,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         if filename is not None:
             self._dqn.save_weights("models/" + filename, overwrite=True)
         else:
-            self._dqn.save_weights("models/model_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S"), overwrite=True)
+            self._dqn.save_weights("models/model_" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".hdf5", overwrite=True)
 
     def load_model(self, filename: str) -> None:
         self._dqn.load_weights("models/" + filename)

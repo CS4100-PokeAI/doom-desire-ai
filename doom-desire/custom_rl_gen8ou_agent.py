@@ -6,6 +6,7 @@ import wandb
 from doom_desire.embed.custom_embedder import CustomEmbedder
 from doom_desire.example_teams.gen8ou import RandomTeamFromPool, team_1, team_2
 from doom_desire.embed.simple_embedder import SimpleEmbedder
+from doom_desire.helpers.reward_calculator import RewardCalculator
 from doom_desire.player.custom_player import CustomRLPlayer
 from poke_env.player.baselines import MaxBasePowerPlayer, SimpleHeuristicsPlayer
 from poke_env.player.random_player import RandomPlayer
@@ -40,8 +41,8 @@ async def main():
         'first_layer_nodes': 256,   # 128       or 500
         'second_layer_nodes': 128,   # 64        or 500
         'third_layer_nodes': -1,
-        'gamma': 0.5,               # 0.5       or 0.99
-        'delta_clip': .01,          # .01       or 0.9
+        'gamma': 0.8,               # 0.5       or 0.99
+        'delta_clip': .9,          # .01       or 0.9
         'target_model_update': 1,   # 1         or 10
         'learning_rate': .001,    # 0.00025   or 0.001
         'memory_limit': 100000,
@@ -50,7 +51,8 @@ async def main():
         'policy': 'EpsGreedyQPolicy',
         'team': 'swampert',
         'opponent': 'rand',
-        'opponent_team': 'swampert'
+        'opponent_team': 'swampert',
+        'load_weights': 'model_2022_04_22_21_16_15.hdf5'  # None
     }
 
     # Initialize a new wandb run; We can use os.environ['WANDB_MODE'] = 'dryrun' to not save wandb to cloud
@@ -62,17 +64,25 @@ async def main():
 
     training_opponent = None
     if config.opponent == 'rand':
-        training_opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder)]
     elif config.opponent == 'max':
-        training_opponent = MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)
+        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)]
     elif config.opponent == 'heuristic':
-        training_opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)
+        training_opponent = [SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
     elif config.opponent == 'rand-max':
         # Each battle is going to be against either a random player or a max base power player
         training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
                              MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)]
+    elif config.opponent == 'rand-heuristic':
+        # Each battle is going to be against either a random player or heuristic player
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
+    elif config.opponent == 'max-heuristic':
+        # Each battle is going to be against either max base power player or heuristic player
+        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
     elif config.opponent == 'all':
-        # Each battle is going to be against either a random player or a max base power player
+        # Each battle is going to be one of the players
         training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
                              MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder),
                              SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
@@ -82,12 +92,19 @@ async def main():
     # Create one environment for both training and evaluation
     training_agent = CustomRLPlayer(battle_format="gen8ou",
                                     config=config,
-                                    embedder=SimpleEmbedder(),
+                                    embedder=CustomEmbedder(),
+                                    reward_calculator=RewardCalculator(),
                                     team=custom_builder,
                                     start_challenging=False)
+    if config.load_weights:
+        training_agent.load_model(config.load_weights)
+
     # training_agent.visualize_model()  # TODO: this doesn't work
     # Train the agent against the opponent for num_steps
-    training_agent.train(training_opponent, num_steps=config.NB_TRAINING_STEPS)
+    training_agent.train(training_opponent,
+                         num_steps=config.NB_TRAINING_STEPS,
+                         in_order=True)
+
 
     # Create the first opponent to evaluate against
     eval_opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
@@ -116,6 +133,9 @@ async def main():
     print(
         f"DQN Evaluation: {training_agent.n_won_battles} victories out of {training_agent.n_finished_battles} episodes"
     )
+
+    if input("Save the model? (y/n): ") is 'y':
+        training_agent.save_model()
 
     training_agent.close()
 
