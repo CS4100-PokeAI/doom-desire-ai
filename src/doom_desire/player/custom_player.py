@@ -7,6 +7,7 @@ from tensorflow.python import keras
 from wandb.keras import WandbCallback
 
 from doom_desire.embed.abstract_embedder import AbstractEmbedder
+from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.helpers.reward_calculator import RewardCalculator
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.env_player import Gen8EnvSinglePlayer
@@ -32,7 +33,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             self,
             battle_format: Optional[str] = None,
             config: wandb.wandb_sdk.Config = None,
-            embedder: AbstractEmbedder = None,
+            embedder: AbstractEmbedder = SimpleEmbedder(),
             reward_calculator: RewardCalculator = None,
             *,
             player_configuration: Optional[PlayerConfiguration] = None,
@@ -64,8 +65,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             team=team,
             start_challenging=start_challenging,
         )
-
-        self._create_model()
+        if config:
+            self._create_model()
 
     def _create_model(self):
 
@@ -117,7 +118,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             delta_clip=self._config.delta_clip,  # 0.01
             enable_double_dqn=True,
         )
-        self._dqn.compile(Adam(learning_rate=self._config.learning_rate),  # learning_rate=0.00025
+        self._dqn.compile(Adam(clipvalue=1.0, learning_rate=self._config.learning_rate),  # learning_rate=0.00025
                           metrics=['mean_squared_error',
                                    'mean_absolute_error',
                                    'mean_absolute_percentage_error',
@@ -307,11 +308,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             self.opponent = opponent
 
     # TODO: Test this
-    def train(
-            self,
-            opponent: Union[Player, str, List[Player], List[str]],
-            num_steps: int,
-            in_order: Optional[bool]=False) -> None:
+    def train(self, opponent: Union[Player, str, List[Player], List[str]],
+              num_steps: int, in_order: Optional[bool]=False) -> None:
 
         self._model.summary()
 
@@ -329,9 +327,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         self.set_opponent(opponent)
         if not self.challenge_task:  # haven't already started challenging opponents
             self.start_challenging()
-        self._dqn.fit(env=self, nb_steps=num_steps, callbacks=[WandbCallback()])
-
-
+        self._dqn.fit(env=self, nb_steps=num_steps, callbacks=[WandbCallback(monitor="val_loss",
+                                                                             log_weights=True,)])
 
 
     # TODO: test this

@@ -3,7 +3,10 @@ import asyncio
 import sys
 import random
 
+import numpy as np
+
 from doom_desire.embed.custom_embedder import CustomEmbedder
+from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.example_teams.gen8ou import team_1, team_2
 from doom_desire.player.custom_player import CustomRLPlayer
 from poke_env.player.random_player import RandomPlayer
@@ -12,24 +15,23 @@ from poke_env.player.utils import cross_evaluate
 from tabulate import tabulate
 
 class TempRandomPlayer(Player):
-    # _plyr = CustomRLPlayer()
+    _plyr = CustomRLPlayer(embedder=CustomEmbedder())
     _custom_embedder = CustomEmbedder()
 
     def choose_move(self, battle):
         order = self.choose_default_move()
 
+        # if battle.turn == 1:
+
         print("Battle Turn: ", battle.turn)
+        # np.set_printoptions(threshold=np.inf)
         print("    Len of Move Embeddings: ", len(self._custom_embedder._embed_move(list(battle.active_pokemon.moves.values())[0])))
+        # print (np.float32(self._custom_embedder._embed_move(list(battle.active_pokemon.moves.values())[0])))
         print("    Len of Mon Embeddings: ", len(self._custom_embedder._embed_mon(battle, battle.active_pokemon)))
+        # print (np.float32(self._custom_embedder._embed_mon(battle, battle.active_pokemon)))
         print("    Len of Opponent Mon Embeddings: ", len(self._custom_embedder._embed_opp_mon(battle, list(battle.opponent_team.values())[0])))
         print("    Len of Battle Embeddings: ", len(self._custom_embedder.embed_battle(battle)))
-
-        # if battle.turn == 1 and battle.active_pokemon[0]:
-        #     print()
-        #     print("Len of Move Embeddings: ", len(self._plyr._embed_move(list(battle.active_pokemon[0].moves.values())[0])))
-        #     print("Len of Mon Embeddings: ", len(self._plyr._embed_mon(battle, battle.active_pokemon[0])))
-        #     print("Len of Opponent Mon Embeddings: ", len(self._plyr._embed_opp_mon(battle, battle.opponent_active_pokemon[0])))
-        #     print("Len of Battle Embeddings: ", len(self._plyr.embed_battle(battle)))
+        # print(self._custom_embedder.embed_battle(battle))
 
         return order
 
@@ -65,6 +67,17 @@ async def main():
 
     # Displays results in a nicely formatted table.
     print(tabulate(table))
+
+    print("Simple Embedding")
+    simple_embedding = SimpleEmbedder()
+    print(simple_embedding.describe_embedding())
+
+    print("Custom Embedding")
+    custom_embedding = CustomEmbedder()
+    print(custom_embedding.describe_embedding())
+    print(len(custom_embedding.describe_embedding().low))
+    print(len(custom_embedding.describe_embedding().high))
+    print(players[1]._plyr.observation_space)
 
 
 if __name__ == "__main__":

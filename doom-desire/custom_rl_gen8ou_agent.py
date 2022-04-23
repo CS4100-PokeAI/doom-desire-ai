@@ -36,7 +36,7 @@ async def main():
 
 
     config_defaults = {
-        'NB_TRAINING_STEPS': 10000,
+        'NB_TRAINING_STEPS': 20000,
         'NB_EVALUATION_EPISODES': 100,
         'first_layer_nodes': 256,   # 128       or 500
         'second_layer_nodes': 128,   # 64        or 500
@@ -49,10 +49,10 @@ async def main():
         'warmup_steps': 1000,       # 1000      or 500
         'activation': "relu",        # "elu"     or "relu"
         'policy': 'EpsGreedyQPolicy',
-        'team': 'swampert',
+        'team': [team_1, ],
         'opponent': 'rand',
-        'opponent_team': 'swampert',
-        'load_weights': 'model_2022_04_22_21_16_15.hdf5'  # None
+        'opponent_team': [team_1, ],
+        'load_weights': None  # 'model_2022_04_22_21_16_15.hdf5'  # None
     }
 
     # Initialize a new wandb run; We can use os.environ['WANDB_MODE'] = 'dryrun' to not save wandb to cloud
@@ -60,32 +60,33 @@ async def main():
     config = wandb.config
 
     # custom_builder = RandomTeamFromPool([team_1, team_2])
-    custom_builder = RandomTeamFromPool([team_1, team_2])
+    player_teams = RandomTeamFromPool(config.team)
+    opponent_teams = RandomTeamFromPool(config.opponent_team)
 
     training_opponent = None
     if config.opponent == 'rand':
-        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'max':
-        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'heuristic':
-        training_opponent = [SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'rand-max':
         # Each battle is going to be against either a random player or a max base power player
-        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
-                             MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=opponent_teams),
+                             MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'rand-heuristic':
         # Each battle is going to be against either a random player or heuristic player
-        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
-                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=opponent_teams),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'max-heuristic':
         # Each battle is going to be against either max base power player or heuristic player
-        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder),
-                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)]
     elif config.opponent == 'all':
         # Each battle is going to be one of the players
-        training_opponent = [RandomPlayer(battle_format="gen8ou", team=custom_builder),
-                             MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder),
-                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)]
+        training_opponent = [RandomPlayer(battle_format="gen8ou", team=opponent_teams),
+                             MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams),
+                             SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)]
 
 
 
@@ -94,7 +95,7 @@ async def main():
                                     config=config,
                                     embedder=CustomEmbedder(),
                                     reward_calculator=RewardCalculator(),
-                                    team=custom_builder,
+                                    team=player_teams,
                                     start_challenging=False)
     if config.load_weights:
         training_agent.load_model(config.load_weights)
@@ -107,7 +108,7 @@ async def main():
 
 
     # Create the first opponent to evaluate against
-    eval_opponent = RandomPlayer(battle_format="gen8ou", team=custom_builder)
+    eval_opponent = RandomPlayer(battle_format="gen8ou", team=opponent_teams)
     # Reset the environment and set the new opponent to play against
     training_agent.reset_env(opponent=eval_opponent, restart=True)
 
@@ -118,7 +119,7 @@ async def main():
         f"DQN Evaluation: {training_agent.n_won_battles} victories out of {training_agent.n_finished_battles} episodes"
     )
 
-    second_opponent = MaxBasePowerPlayer(battle_format="gen8ou", team=custom_builder)
+    second_opponent = MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams)
     training_agent.reset_env(opponent=second_opponent, restart=True)
     print("Results against max base power player:")
     training_agent.evaluate_model(num_battles=config.NB_EVALUATION_EPISODES)
@@ -126,7 +127,7 @@ async def main():
         f"DQN Evaluation: {training_agent.n_won_battles} victories out of {training_agent.n_finished_battles} episodes"
     )
 
-    third_opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=custom_builder)
+    third_opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)
     training_agent.reset_env(opponent=third_opponent, restart=True)
     print("Results against simple heuristics player:")
     training_agent.evaluate_model(num_battles=config.NB_EVALUATION_EPISODES)

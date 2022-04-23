@@ -60,6 +60,8 @@ class CustomEmbedder(AbstractEmbedder):
         self.OPP_MON_LEN = 173
         self.BATTLE_LEN = 2113
 
+        self._embedding_description = self._describe_embedding()
+
     # Returns an array of an embedded move; could be precomputed (total length of 30 with all shortenings)
     def _embed_move(self, move):
         """
@@ -132,7 +134,7 @@ class CustomEmbedder(AbstractEmbedder):
                          'move_category': {'low': -1, 'high': 1, 'times': 3},
                          'type': {'low': -1, 'high': 1, 'times': 18},
                          'stat_boost': {'low': -6, 'high': 6, 'times': 5},
-                         'secondary_chance': {'low': -1, 'high': 1, 'times': 1}
+                         'secondary_chance': {'low': -1, 'high': 100, 'times': 1}
                          }
 
         low_move  =  [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
@@ -316,8 +318,8 @@ class CustomEmbedder(AbstractEmbedder):
         # TODO: Add embedding for current opponent's mon's boosts
 
         embeddings.append([
-            battle.dynamax_turns_left,
-            battle.opponent_dynamax_turns_left
+            3 if battle._dynamax_turn is None else max(3 - (battle.turn - battle._dynamax_turn), 0),
+            3 if battle._opponent_dynamax_turn is None else max(3 - (battle.turn - battle._opponent_dynamax_turn), 0),
         ])
 
         # Add Fields;
@@ -329,7 +331,15 @@ class CustomEmbedder(AbstractEmbedder):
         # Add Weathers
         embeddings.append([1 if weather == battle.weather else 0 for weather in self._knowledge['Weather']])
 
-        return np.float32([item for sublist in embeddings for item in sublist])
+        return_embedding = np.float32([item for sublist in embeddings for item in sublist])
+
+        if any(return_embedding[i] < self._embedding_description.low[i] for i in range(len(self._embedding_description.low))):
+            print("Embedding value lower than limit: \n", return_embedding, self._embedding_description.low)
+        for i in range(len(self._embedding_description.high)):
+            if return_embedding[i] > self._embedding_description.high[i]:
+                print("Embedding value higher than limit (i=", i,") : ", return_embedding[i], " > ", self._embedding_description.high[i])
+
+        return return_embedding
 
     def _describe_battle_embedding(self):
         """
@@ -361,7 +371,7 @@ class CustomEmbedder(AbstractEmbedder):
 
         return low_battle, high_battle
 
-    def describe_embedding(self) -> Space:
+    def _describe_embedding(self) -> Space:
 
         low, high = self._describe_battle_embedding()
         return Box(
@@ -369,6 +379,9 @@ class CustomEmbedder(AbstractEmbedder):
             np.array(high, dtype=np.float32),
             dtype=np.float32,
         )
+
+    def describe_embedding(self) -> Space:
+        return self._embedding_description
 
     def embedding_shape(self) -> Tuple[int, int]:
         return (1, self.BATTLE_LEN)
