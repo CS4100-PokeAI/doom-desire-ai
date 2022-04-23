@@ -111,3 +111,7 @@ class RewardCalculator():
             current_value -= self._victory_value
 
         return current_value
+
+    @property
+    def starting_value(self):
+        return self._starting_value

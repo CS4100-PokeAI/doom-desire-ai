@@ -275,7 +275,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
                     ) -> float:
 
         if current_battle not in self._reward_buffer:
-            self._reward_buffer[current_battle] = self._reward_calculator._starting_value
+            self._reward_buffer[current_battle] = self._reward_calculator.starting_value
 
         current_value = self._reward_calculator.calc_reward(battle=current_battle)
 
@@ -307,7 +307,6 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         with self.opponent_lock:
             self.opponent = opponent
 
-    # TODO: Test this
     def train(self, opponent: Union[Player, str, List[Player], List[str]],
               num_steps: int, in_order: Optional[bool]=False) -> None:
 
@@ -328,15 +327,48 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         if not self.challenge_task:  # haven't already started challenging opponents
             self.start_challenging()
         self._dqn.fit(env=self, nb_steps=num_steps, callbacks=[WandbCallback(monitor="val_loss",
-                                                                             log_weights=True,)])
+                                                                             verbose=0,
+                                                                             mode="auto",
+                                                                             save_weights_only=False,
+                                                                             log_weights=True,  # changed
+                                                                             log_gradients=False,
+                                                                             save_model=True,
+                                                                             training_data=None,
+                                                                             validation_data=None,
+                                                                             labels=[],
+                                                                             predictions=36,
+                                                                             generator=None,
+                                                                             input_type=None,
+                                                                             output_type=None,
+                                                                             log_evaluation=False,
+                                                                             validation_steps=None,
+                                                                             class_colors=None,
+                                                                             log_batch_frequency=None,
+                                                                             log_best_prefix="best_",
+                                                                             save_graph=True,
+                                                                             validation_indexes=None,
+                                                                             validation_row_processor=None,
+                                                                             prediction_row_processor=None,
+                                                                             infer_missing_processors=True,
+                                                                             log_evaluation_frequency=0,)])
 
 
     # TODO: test this
     def evaluate_model(self, num_battles: int, visualize=False, verbose=False, verbose_end=False) -> float:
+
+        if not self.challenge_task:  # haven't already started challenging opponents
+            self.start_challenging()
         self.reset_battles()
+
         self._dqn.test(env=self, nb_episodes=num_battles, verbose=verbose, visualize=visualize)
-        if verbose_end: print("DQN Evaluation: %d wins out of %d battles" % (self.n_won_battles, num_battles))
+        if verbose_end:
+            print(
+            f"DQN Evaluation: {self.n_won_battles} victories out of {self.n_finished_battles} battles\n"
+            )
         return self.n_won_battles * 1. / num_battles
+
+    def test(self, num_battles: int, visualize=False, verbose=False):
+        self._dqn.test(env=self, nb_episodes=num_battles, verbose=verbose, visualize=visualize)
 
 
     def save_model(self, filename=None) -> None:
