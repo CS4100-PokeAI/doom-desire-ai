@@ -773,6 +773,7 @@
   "pp": 40,
   "priority": 0,
   "flags": {},
+  "onHit": "onHit",
   "self": {
    "onHit": "onHit"
   },
@@ -2163,7 +2164,7 @@
   "priority": -5,
   "flags": {"contact": 1, "protect": 1},
   "beforeTurnCallback": "beforeTurnCallback",
-  "onTryHit": "onTryHit",
+  "onTry": "onTry",
   "condition": {
    "duration": 1,
    "noCopy": true,
@@ -6075,7 +6076,7 @@
   "pp": 10,
   "priority": 0,
   "flags": {"snatch": 1, "heal": 1},
-  "onTryHit": "onTryHit",
+  "onHit": "onHit",
   "selfdestruct": "ifHit",
   "slotCondition": "healingwish",
   "condition": {
@@ -7796,7 +7797,7 @@
   "pp": 10,
   "priority": 0,
   "flags": {"snatch": 1, "heal": 1, "dance": 1},
-  "onTryHit": "onTryHit",
+  "onHit": "onHit",
   "selfdestruct": "ifHit",
   "slotCondition": "lunardance",
   "condition": {
@@ -8557,7 +8558,7 @@
   "pp": 10,
   "priority": 0,
   "flags": {"protect": 1, "mirror": 1},
-  "onTryHit": "onTryHit",
+  "onTry": "onTry",
   "onModifyTarget": "onModifyTarget",
   "secondary": null,
   "target": "scripted",
@@ -8796,7 +8797,7 @@
   "priority": -5,
   "flags": {"protect": 1},
   "beforeTurnCallback": "beforeTurnCallback",
-  "onTryHit": "onTryHit",
+  "onTry": "onTry",
   "condition": {
    "duration": 1,
    "noCopy": true,
@@ -13918,8 +13919,8 @@
   "pp": 20,
   "priority": -6,
   "flags": {},
+  "onTry": "onTry",
   "selfSwitch": true,
-  "onTryHit": true,
   "secondary": null,
   "target": "self",
   "type": "Psychic",
