@@ -80,7 +80,7 @@ class EnvPlayer(OpenAIGymEnv, ABC):
         if battle_format:
             b_format = battle_format
         if not self.opponent:  # if not explicitly given an opponent, make opponent a random player
-            self.opponent = RandomPlayer(battle_format=b_format)
+            self.opponent = RandomPlayer(battle_format=b_format, team=team)
         super().__init__(
             player_configuration=player_configuration,
             avatar=avatar,

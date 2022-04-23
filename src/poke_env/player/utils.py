@@ -144,11 +144,11 @@ async def evaluate_player(
         interval
     :rtype: tuple of float and tuple of floats
     """
-    # Input checks
-    assert player.format == "gen8randombattle", (
-        "Player %s can not be evaluated as its current format (%s) is not "
-        "gen8randombattle." % (player, player.format)
-    )
+    # # Input checks
+    # assert player.format == "gen8randombattle", (
+    #     "Player %s can not be evaluated as its current format (%s) is not "
+    #     "gen8randombattle." % (player, player.format)
+    # )
 
     if n_placement_battles * len(_EVALUATION_RATINGS) > n_battles // 2:
         player.logger.warning(
@@ -167,7 +167,12 @@ async def evaluate_player(
     "battles to perform to evaluate the player."
 
     # Initial placement battles
-    baselines = [p(max_concurrent_battles=n_battles) for p in _EVALUATION_RATINGS]
+    if player.format is "gen8ou":
+        baselines = [p(battle_format="gen8ou", team=player._team, max_concurrent_battles=n_battles)
+                     for p in _EVALUATION_RATINGS]
+    else:
+        baselines = [p(battle_format="gen8randombattle", max_concurrent_battles=n_battles)
+                     for p in _EVALUATION_RATINGS]
 
     for p in baselines:
         await p.battle_against(player, n_placement_battles)
