@@ -5,10 +5,14 @@ import wandb
 from tabulate import tabulate
 
 from doom_desire.embed.custom_embedder import CustomEmbedder
+from doom_desire.embed.custom_tiny_embedder import CustomTinyEmbedder
+from doom_desire.embed.matchup_embedder import MatchupEmbedder
+from doom_desire.embed.simple_plus_embedder import SimplePlusEmbedder
 from doom_desire.example_teams.gen8ou import RandomTeamFromPool, team_1, team_2
 from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.example_teams.team_repo import TeamRepository
 from doom_desire.helpers.reward_calculator import RewardCalculator
+from doom_desire.models.battle_modeler import SequentialBattleModeler
 from doom_desire.player.custom_player import CustomRLPlayer
 from poke_env.player.baselines import MaxBasePowerPlayer, SimpleHeuristicsPlayer
 from poke_env.player.random_player import RandomPlayer
@@ -37,10 +41,12 @@ from poke_env.teambuilder.teambuilder import Teambuilder
 
 config_defaults = {
     'train': True,
-    'evaluate': False,
+    'evaluate': True,
     'cross_evaluate': False,
 
-    'NB_TRAINING_STEPS': 200000,
+    'embedder': 'simple_plus',
+
+    'NB_TRAINING_STEPS': 20000,
     'NB_EVALUATION_EPISODES': 100,
     'first_layer_nodes': 256,  # 128       or 500
     'second_layer_nodes': 128,  # 64        or 500
@@ -56,10 +62,19 @@ config_defaults = {
     'team': TeamRepository.teams_as_list,
     'opponent': 'combo',
     'opponent_team': TeamRepository.teams_as_list,  # [team_1, team_2]
-    'load_weights': None,  # 'model_2022_04_22_21_16_15.hdf5'  # None
-    'force_save_model': True,
+
+    'load_weights': False,
+    'weights_file': 'model_custom_600000.hdf5',  # 'model_2022_04_22_21_16_15.hdf5'  # None
+    'force_save_model': False,
 }
 
+embedders = {
+    'simple': SimpleEmbedder(),
+    'custom': CustomEmbedder(),
+    'custom_tiny': CustomTinyEmbedder(),
+    'matchup': MatchupEmbedder(),
+    'simple_plus': SimplePlusEmbedder()
+}
 
 def set_training_opponents(config):
     opponent_teams = RandomTeamFromPool(config.opponent_team)
@@ -111,20 +126,16 @@ def evaluate_trained_agent(config, trained_agent: CustomRLPlayer):
 
     # Create the first opponent to evaluate against
     eval_opponent = RandomPlayer(battle_format="gen8ou", team=opponent_teams)
-    trained_agent.set_opponent(opponent=eval_opponent)
-
     print("Results against random player:")
-    trained_agent.evaluate_model(num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
+    trained_agent.evaluate_model(opponent=eval_opponent, num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
 
     second_opponent = MaxBasePowerPlayer(battle_format="gen8ou", team=opponent_teams)
-    trained_agent.reset_env(opponent=second_opponent, restart=True)
     print("Results against max base power player:")
-    trained_agent.evaluate_model(num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
+    trained_agent.evaluate_model(opponent=second_opponent, num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
 
     third_opponent = SimpleHeuristicsPlayer(battle_format="gen8ou", team=opponent_teams)
-    trained_agent.reset_env(opponent=third_opponent, restart=True)
     print("Results against simple heuristics player:")
-    trained_agent.evaluate_model(num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
+    trained_agent.evaluate_model(opponent=third_opponent, num_battles=config.NB_EVALUATION_EPISODES, verbose_end=True)
 
 
 async def cross_evaluate_trained_agent(config, trained_agent: CustomRLPlayer):
@@ -172,12 +183,12 @@ async def main():
     player_teams = RandomTeamFromPool(config.team)
     training_agent = CustomRLPlayer(battle_format="gen8ou",
                                     config=config,
-                                    embedder=CustomEmbedder(),
+                                    battle_modeler=SequentialBattleModeler(config, embedder=embedders[config.embedder]),
                                     reward_calculator=RewardCalculator(),
                                     team=player_teams,
                                     start_challenging=False)
     if config.load_weights:
-        training_agent.load_model(config.load_weights)
+        training_agent.load_model(config.weights_file)
 
     # training_agent.visualize_model()  # TODO: this doesn't work
 
@@ -187,6 +198,7 @@ async def main():
         training_agent.train(training_opponent,
                              num_steps=config.NB_TRAINING_STEPS,
                              in_order=True)
+        # training_agent.done()
 
     if config.evaluate:
         evaluate_trained_agent(config, trained_agent=training_agent)

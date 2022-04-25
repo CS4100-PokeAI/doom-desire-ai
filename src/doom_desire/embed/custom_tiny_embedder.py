@@ -4,7 +4,7 @@ import numpy as np
 from gym import Space
 from gym.spaces import Box
 
-from doom_desire.embed.abstract_embedder import AbstractEmbedder, AbstractFlatEmbedder
+from doom_desire.embed.abstract_embedder import AbstractFlatEmbedder
 from poke_env.data import GEN_TO_MOVES, GEN_TO_POKEDEX
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.environment.field import Field
@@ -21,7 +21,7 @@ from poke_env.environment.weather import Weather
 ObservationType = TypeVar("ObservationType")
 
 
-class CustomEmbedder(AbstractFlatEmbedder):
+class CustomTinyEmbedder(AbstractFlatEmbedder):
 
     def __init__(self, gen=8, priority=0):
 
@@ -58,7 +58,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         self.MON_LEN = 172
         self.OPP_MON_LEN = 173
         self.FIELD_LEN = 43
-        self.BATTLE_LEN = 2113
+        self.BATTLE_LEN = 345
 
         self._embedding_description = self._describe_embedding()
 
@@ -82,7 +82,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Encode other properties
         embeddings.append([  # Total length of 3
             move.accuracy,
-            move.base_power,
+            move.base_power / 100,  # maybe normalizing this will help
             move.priority,
         ])
 
@@ -114,7 +114,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         chance = 0
         for x in move.secondary:
             chance = max(chance, x.get('chance', 0))
-        embeddings.append([chance])
+        embeddings.append([chance / 100])  # normalizing
 
         # Flatten the arrays
         return [item for sublist in embeddings for item in sublist]
@@ -129,12 +129,12 @@ class CustomEmbedder(AbstractFlatEmbedder):
             chance of secondary (1 total)
         """
         low_high_dict = {'accuracy': {'low': -1, 'high': 1, 'times': 1},
-                         'base_power': {'low': -1, 'high': 300, 'times': 1},
+                         'base_power': {'low': -1, 'high': 3, 'times': 1},
                          'priority': {'low': -7, 'high': 6, 'times': 1},
                          'move_category': {'low': -1, 'high': 1, 'times': 3},
                          'type': {'low': -1, 'high': 1, 'times': 18},
                          'stat_boost': {'low': -6, 'high': 6, 'times': 5},
-                         'secondary_chance': {'low': -1, 'high': 100, 'times': 1}
+                         'secondary_chance': {'low': -1, 'high': 1, 'times': 1}
                          }
 
         low_move  =  [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
@@ -161,13 +161,13 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # its weight and whether its recharging or preparing
         embeddings.append([
             int(mon.active),
-            mon.current_hp,
+            mon.current_hp / 100,  # normalizing
             int(mon.fainted),
             int(mon.is_dynamaxed),
         ])
 
         # Add stats and boosts
-        embeddings.append(mon.stats.values())
+        embeddings.append(stat / 100 for stat in mon.stats.values())
         # embeddings.append(mon.boosts.values())  # only the current can have boosts anyway so don't do for all
 
         # Add status (one-hot encoded)
@@ -193,10 +193,10 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         low_high_dict = {'moves': {'low': low_move, 'high': high_move, 'times': 4},
                          'active': {'low': [0], 'high': [1], 'times': 1},
-                         'current_hp': {'low': [0], 'high': [1000], 'times': 1},
+                         'current_hp': {'low': [0], 'high': [10], 'times': 1},
                          'fainted': {'low': [0], 'high': [1], 'times': 1},
                          'dynamaxed': {'low': [0], 'high': [1], 'times': 1},
-                         'stat_val': {'low': [0], 'high': [1000], 'times': 5},
+                         'stat_val': {'low': [0], 'high': [10], 'times': 5},
                          'status': {'low': [0], 'high': [1], 'times': 7},
                          'type1': {'low': [0], 'high': [1], 'times': 18},
                          'type2': {'low': [0], 'high': [1], 'times': 18},
@@ -210,7 +210,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         return low_mon, high_mon
 
-    def _embed_opp_mon(self, mon) -> ObservationType:
+    def _embed_opp_mon(self, mon: Pokemon) -> ObservationType:
         """
         Things embedded for a 173 total
             4x moves (30 each, 120 total)
@@ -228,13 +228,13 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Add whether the mon is active, the current hp, whether its fainted, its level, its weight and whether its recharging or preparing
         embeddings.append([
             int(mon.active),  # This mon is on the field now
-            mon.current_hp,
+            mon.current_hp / 100,
             int(mon.fainted),
             int(mon.is_dynamaxed),
         ])
 
         # Add stats and boosts
-        embeddings.append(mon.base_stats.values())
+        embeddings.append(stat / 100 for stat in mon.base_stats.values())
         # embeddings.append(mon.boosts.values())
 
         # Add status (one-hot encoded)
@@ -260,10 +260,10 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         low_high_dict = {'moves': {'low': low_move, 'high': high_move, 'times': 4},
                          'active': {'low': [0], 'high': [1], 'times': 1},
-                         'current_hp': {'low': [0], 'high': [1000], 'times': 1},
+                         'current_hp': {'low': [0], 'high': [10], 'times': 1},
                          'fainted': {'low': [0], 'high': [1], 'times': 1},
                          'dynamaxed': {'low': [0], 'high': [1], 'times': 1},
-                         'base_stat': {'low': [0], 'high': [1000], 'times': 6},
+                         'base_stat': {'low': [0], 'high': [10], 'times': 6},
                          'status': {'low': [0], 'high': [1], 'times': 7},
                          'type1': {'low': [0], 'high': [1], 'times': 18},
                          'type2': {'low': [0], 'high': [1], 'times': 18},
@@ -276,56 +276,6 @@ class CustomEmbedder(AbstractFlatEmbedder):
         high_opp_mon = [item for sublist in high_opp_mon for item in sublist]
 
         return low_opp_mon, high_opp_mon
-
-    def embed_team(self, battle) -> ObservationType:
-        embeddings = []
-
-        # Add team to embeddings
-        for mon in battle.team.values():
-            embeddings.append(self._embed_mon(battle, mon))
-
-        return embeddings
-
-    def embed_opp_team(self, battle) -> ObservationType:
-        embeddings = []
-
-        embedded_opp_mons = set()
-
-        for mon in battle.opponent_team.values():
-            if mon.species in embedded_opp_mons: continue
-            embeddings.append(self._embed_opp_mon(battle, mon))
-            embedded_opp_mons.add(mon.species)
-
-        for mon in battle.teampreview_opponent_team:
-            if mon in embedded_opp_mons: continue
-            # handle multiple indifferentiable forms (i.e. 'urshifu' in team preview but 'urshifurapidstrike' once seen)
-            if any(mon in seen_mon for seen_mon in embedded_opp_mons): continue
-            embeddings.append(self._embed_opp_mon(battle, battle.teampreview_opponent_team[mon]))
-            embedded_opp_mons.add(mon)
-
-        return embeddings
-
-    def embed_field(self, battle) -> ObservationType:
-        embeddings = []
-
-        embeddings.append([
-            3 if battle._dynamax_turn is None else max(3 - (battle.turn - battle._dynamax_turn), 0),
-            3 if battle._opponent_dynamax_turn is None else max(3 - (battle.turn - battle._opponent_dynamax_turn), 0),
-        ])
-
-        # Add Fields;
-        embeddings.append([1 if field in battle.fields else 0 for field in self._knowledge['Field']])
-
-        # Add Side Conditions
-        embeddings.append([1 if sc in battle.side_conditions else 0 for sc in self._knowledge['SideCondition']])
-
-        # Add Weathers
-        embeddings.append([1 if weather == battle.weather else 0 for weather in self._knowledge['Weather']])
-
-        return embeddings
-
-    def field_embedding_shape(self) -> Tuple[int, int]:
-        return (1, self.FIELD_LEN)
 
 
     # Embeds the state of the battle in a X-dimensional embedding
@@ -345,51 +295,16 @@ class CustomEmbedder(AbstractFlatEmbedder):
         embeddings = []
 
         # Add team to embeddings
-        for mon in battle.team.values():
-            embeddings.append(self._embed_mon(mon))
-
-        # TODO: Add embedding for current mon's boosts
-
-        # Embed opponent's mons. teampreview_opponent_team has empty move slots while opponent_team has moves we remember.
-        # We first embed opponent_active_pokemon, then ones we remember from the team, then the rest
-        embedded_opp_mons = set()
-
-        for mon in battle.opponent_team.values():
-            if mon.species in embedded_opp_mons: continue
-            embeddings.append(self._embed_opp_mon(mon))
-            embedded_opp_mons.add(mon.species)
-
-        for mon in battle.teampreview_opponent_team:
-            if mon in embedded_opp_mons: continue
-            # handle multiple indifferentiable forms (i.e. 'urshifu' in team preview but 'urshifurapidstrike' once seen)
-            if any(mon in seen_mon for seen_mon in embedded_opp_mons): continue
-            embeddings.append(self._embed_opp_mon(battle.teampreview_opponent_team[mon]))
-            embedded_opp_mons.add(mon)
-
-        # TODO: Add embedding for current opponent's mon's boosts
-
-        embeddings.append([
-            3 if battle._dynamax_turn is None else max(3 - (battle.turn - battle._dynamax_turn), 0),
-            3 if battle._opponent_dynamax_turn is None else max(3 - (battle.turn - battle._opponent_dynamax_turn), 0),
-        ])
-
-        # Add Fields;
-        embeddings.append([1 if field in battle.fields else 0 for field in self._knowledge['Field']])
-
-        # Add Side Conditions
-        embeddings.append([1 if sc in battle.side_conditions else 0 for sc in self._knowledge['SideCondition']])
-
-        # Add Weathers
-        embeddings.append([1 if weather == battle.weather else 0 for weather in self._knowledge['Weather']])
+        embeddings.append(self._embed_mon(battle.active_pokemon))
+        embeddings.append(self._embed_opp_mon(battle.opponent_active_pokemon))
 
         return_embedding = np.float32([item for sublist in embeddings for item in sublist])
 
-        # used for debugging embedding
-        # if any(return_embedding[i] < self._embedding_description.low[i] for i in range(len(self._embedding_description.low))):
-        #     print("Embedding value lower than limit: \n", return_embedding, self._embedding_description.low)
-        # for i in range(len(self._embedding_description.high)):
-        #     if return_embedding[i] > self._embedding_description.high[i]:
-        #         print("Embedding value higher than limit (i=", i,") : ", return_embedding[i], " > ", self._embedding_description.high[i])
+        if any(return_embedding[i] < self._embedding_description.low[i] for i in range(len(self._embedding_description.low))):
+            print("Embedding value lower than limit: \n", return_embedding, self._embedding_description.low)
+        for i in range(len(self._embedding_description.high)):
+            if return_embedding[i] > self._embedding_description.high[i]:
+                print("Embedding value higher than limit (i=", i,") : ", return_embedding[i], " > ", self._embedding_description.high[i])
 
         return return_embedding
 
@@ -406,13 +321,8 @@ class CustomEmbedder(AbstractFlatEmbedder):
         low_mon, high_mon = self._describe_mon_embedding()
         low_opp_mon, high_opp_mon = self._describe_opp_mon_embedding()
 
-        low_high_dict = {'team': {'low': low_mon, 'high': high_mon, 'times': 6},
-                         'opp_team': {'low': low_opp_mon, 'high': high_opp_mon, 'times': 6},
-                         'max_turns': {'low': [0], 'high': [3], 'times': 1},
-                         'opp_max_turns': {'low': [0], 'high': [3], 'times': 1},
-                         'field': {'low': [0], 'high': [1], 'times': 13},
-                         'side_condition': {'low': [0], 'high': [1], 'times': 20},
-                         'weather': {'low': [0], 'high': [1], 'times': 8},
+        low_high_dict = {'team': {'low': low_mon, 'high': high_mon, 'times': 1},
+                         'opp_team': {'low': low_opp_mon, 'high': high_opp_mon, 'times': 1},
                          }
 
         low_battle  = [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]

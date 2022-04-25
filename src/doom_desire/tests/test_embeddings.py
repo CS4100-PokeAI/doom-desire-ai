@@ -6,6 +6,7 @@ import random
 import numpy as np
 
 from doom_desire.embed.custom_embedder import CustomEmbedder
+from doom_desire.embed.matchup_embedder import MatchupEmbedder
 from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.example_teams.gen8ou import team_1, team_2
 from doom_desire.player.custom_player import CustomRLPlayer
@@ -15,7 +16,7 @@ from poke_env.player.utils import cross_evaluate
 from tabulate import tabulate
 
 class TempRandomPlayer(Player):
-    _plyr = CustomRLPlayer(embedder=CustomEmbedder())
+    # _plyr = CustomRLPlayer(embedder=CustomEmbedder())
     _custom_embedder = CustomEmbedder()
 
     def choose_move(self, battle):
@@ -27,9 +28,9 @@ class TempRandomPlayer(Player):
         # np.set_printoptions(threshold=np.inf)
         print("    Len of Move Embeddings: ", len(self._custom_embedder._embed_move(list(battle.active_pokemon.moves.values())[0])))
         # print (np.float32(self._custom_embedder._embed_move(list(battle.active_pokemon.moves.values())[0])))
-        print("    Len of Mon Embeddings: ", len(self._custom_embedder._embed_mon(battle, battle.active_pokemon)))
+        print("    Len of Mon Embeddings: ", len(self._custom_embedder._embed_mon(battle.active_pokemon)))
         # print (np.float32(self._custom_embedder._embed_mon(battle, battle.active_pokemon)))
-        print("    Len of Opponent Mon Embeddings: ", len(self._custom_embedder._embed_opp_mon(battle, list(battle.opponent_team.values())[0])))
+        print("    Len of Opponent Mon Embeddings: ", len(self._custom_embedder._embed_opp_mon(list(battle.opponent_team.values())[0])))
         print("    Len of Battle Embeddings: ", len(self._custom_embedder.embed_battle(battle)))
         # print(self._custom_embedder.embed_battle(battle))
 
@@ -77,7 +78,7 @@ async def main():
     print(custom_embedding.describe_embedding())
     print(len(custom_embedding.describe_embedding().low))
     print(len(custom_embedding.describe_embedding().high))
-    print(players[1]._plyr.observation_space)
+    # print(players[1]._plyr.observation_space)
 
 
 if __name__ == "__main__":

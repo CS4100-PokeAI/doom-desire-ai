@@ -9,7 +9,6 @@ from wandb.keras import WandbCallback
 from doom_desire.embed.abstract_embedder import AbstractEmbedder
 from doom_desire.embed.simple_embedder import SimpleEmbedder
 from doom_desire.helpers.reward_calculator import RewardCalculator
-from doom_desire.models.battle_modeler import AbstractBattleModeler
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.env_player import Gen8EnvSinglePlayer
 from poke_env.player.openai_api import ObservationType
@@ -34,7 +33,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             self,
             battle_format: Optional[str] = None,
             config: wandb.wandb_sdk.Config = None,
-            battle_modeler: AbstractBattleModeler = None,
+            embedder: AbstractEmbedder = SimpleEmbedder(),
             reward_calculator: RewardCalculator = None,
             *,
             player_configuration: Optional[PlayerConfiguration] = None,
@@ -50,7 +49,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
     ):
         self._config = config
 
-        self._battle_modeler = battle_modeler
+        self._embedder = embedder
 
         self._reward_calculator = reward_calculator
 
@@ -70,64 +69,64 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             self._create_model()
 
     def _create_model(self):
-        self._model, self._policy, self._memory, self._dqn = self._battle_modeler.build_model(self.action_space_size())
-        #
-        # self._model = Sequential()
-        # self._model.add(Dense(self._config.first_layer_nodes,  # 128
-        #                       activation=self._config.activation,  # 'elu'
-        #                       input_shape=self._embedder.embedding_shape()))
-        #
-        # # Flattening resolve potential issues that would arise otherwise
-        # self._model.add(Flatten())
-        # if self._config.second_layer_nodes > 0:
-        #     self._model.add(Dense(self._config.second_layer_nodes,  # 64
-        #                           activation=self._config.activation))  # 'elu'
-        #
-        # if self._config.third_layer_nodes > 0:
-        #     self._model.add(Dense(self._config.third_layer_nodes,
-        #                           activation=self._config.activation,
-        #                           kernel_initializer='he_uniform'))
-        #
-        # self._model.add(Dense(units=self.action_space_size(), activation="linear"))
-        #
-        # self._policy = None
-        # if self._config.policy == 'MaxBoltzmannQPolicy':
-        #     self._policy = MaxBoltzmannQPolicy() # https://github.com/keras-rl/keras-rl/blob/master/rl/policy.py#L242
-        # elif self._config.policy == 'EpsGreedyQPolicy':
-        #     self._policy = EpsGreedyQPolicy(eps=.1)
-        # elif self._config.policy == 'LinearAnnealedPolicy':
-        #     self._policy = LinearAnnealedPolicy(
-        #         EpsGreedyQPolicy(),
-        #         attr="eps",
-        #         value_max=1.0,   # 1.0  or 0.5
-        #         value_min=0.05,  # 0.05 or 0.025
-        #         value_test=0,
-        #         nb_steps=self._config.NB_TRAINING_STEPS,
-        #     )
-        #
-        # self._memory = SequentialMemory(limit=self._config.memory_limit,
-        #                                 window_length=1)
-        #
-        # # Defining our DQN
-        # self._dqn = DQNAgent(
-        #     model=self._model,
-        #     nb_actions=self.action_space_size(),
-        #     policy=self._policy,
-        #     memory=self._memory,
-        #     nb_steps_warmup=self._config.warmup_steps,  # 1000
-        #     gamma=self._config.gamma,  # 0.5
-        #     target_model_update=self._config.target_model_update,  # 1
-        #     delta_clip=self._config.delta_clip,  # 0.01
-        #     enable_double_dqn=True,
-        # )
-        # self._dqn.compile(Adam(clipvalue=1.0, learning_rate=self._config.learning_rate),  # learning_rate=0.00025
-        #                   metrics=['mean_squared_error',
-        #                            'mean_absolute_error',
-        #                            'mean_absolute_percentage_error',
-        #                            'cosine_proximity'])
+
+
+
+        self._model = Sequential()
+        self._model.add(Dense(self._config.first_layer_nodes,  # 128
+                              activation=self._config.activation,  # 'elu'
+                              input_shape=self._embedder.embedding_shape()))
+
+        # Flattening resolve potential issues that would arise otherwise
+        self._model.add(Flatten())
+        if self._config.second_layer_nodes > 0:
+            self._model.add(Dense(self._config.second_layer_nodes,  # 64
+                                  activation=self._config.activation))  # 'elu'
+
+        if self._config.third_layer_nodes > 0:
+            self._model.add(Dense(self._config.third_layer_nodes,
+                                  activation=self._config.activation,
+                                  kernel_initializer='he_uniform'))
+
+        self._model.add(Dense(units=self.action_space_size(), activation="linear"))
+
+        self._policy = None
+        if self._config.policy == 'MaxBoltzmannQPolicy':
+            self._policy = MaxBoltzmannQPolicy() # https://github.com/keras-rl/keras-rl/blob/master/rl/policy.py#L242
+        elif self._config.policy == 'EpsGreedyQPolicy':
+            self._policy = EpsGreedyQPolicy(eps=.1)
+        elif self._config.policy == 'LinearAnnealedPolicy':
+            self._policy = LinearAnnealedPolicy(
+                EpsGreedyQPolicy(),
+                attr="eps",
+                value_max=1.0,   # 1.0  or 0.5
+                value_min=0.05,  # 0.05 or 0.025
+                value_test=0,
+                nb_steps=self._config.NB_TRAINING_STEPS,
+            )
+
+        self._memory = SequentialMemory(limit=self._config.memory_limit,
+                                        window_length=1)
+
+        # Defining our DQN
+        self._dqn = DQNAgent(
+            model=self._model,
+            nb_actions=self.action_space_size(),
+            policy=self._policy,
+            memory=self._memory,
+            nb_steps_warmup=self._config.warmup_steps,  # 1000
+            gamma=self._config.gamma,  # 0.5
+            target_model_update=self._config.target_model_update,  # 1
+            delta_clip=self._config.delta_clip,  # 0.01
+            enable_double_dqn=True,
+        )
+        self._dqn.compile(Adam(clipvalue=1.0, learning_rate=self._config.learning_rate),  # learning_rate=0.00025
+                          metrics=['mean_squared_error',
+                                   'mean_absolute_error',
+                                   'mean_absolute_percentage_error',
+                                   'cosine_proximity'])
 
         # Simple model where only one layer feeds into the next
-
         """
         self._model = Sequential()
         self._model.add(Dense(self._config.first_layer_nodes,
@@ -244,6 +243,34 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         #     ]
         # )
 
+    @property
+    def model(self) -> training.Model:
+        """
+        Return our Keras-trained model
+        """
+        return self._model
+
+    @property
+    def memory(self) -> Memory:
+        """
+        Return the memory for our DQN
+        """
+        return self._memory
+
+    @property
+    def policy(self) -> Policy:
+        """
+        Return our policy for our DQN
+        """
+        return self._policy
+
+    @property
+    def dqn(self) -> DQNAgent:
+        """
+        Return our DQN object
+        """
+        return self._dqn
+
     def calc_reward(self,
                     last_battle: AbstractBattle,
                     current_battle: AbstractBattle
@@ -260,10 +287,10 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
         return to_return
 
     def embed_battle(self, battle: AbstractBattle) -> ObservationType:
-        return self._battle_modeler.model_embedding(battle)  # This does not need to be singular, can be a list/tuple
+        return self._embedder.embed_battle(battle)
 
     def describe_embedding(self) -> Space:
-        return self._battle_modeler.describe_embedding()
+        return self._embedder.describe_embedding()
 
     def set_opponent(self, opponent: Union[Player, str, List[Player], List[str]]):
         """
@@ -320,7 +347,7 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
                                                                              class_colors=None,
                                                                              log_batch_frequency=None,
                                                                              log_best_prefix="best_",
-                                                                             save_graph=False,
+                                                                             save_graph=True,
                                                                              validation_indexes=None,
                                                                              validation_row_processor=None,
                                                                              prediction_row_processor=None,
@@ -329,11 +356,11 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
 
 
     # TODO: test this
-    def evaluate_model(self, opponent: Player, num_battles: int, visualize=False, verbose=False, verbose_end=False) -> float:
+    def evaluate_model(self, num_battles: int, visualize=False, verbose=False, verbose_end=False) -> float:
 
         if not self.challenge_task:  # haven't already started challenging opponents
             self.start_challenging()
-        self.reset_env(restart=True, opponent=opponent)
+        self.reset_battles()
 
         self._dqn.test(env=self, nb_episodes=num_battles, verbose=verbose, visualize=visualize)
         if verbose_end:
@@ -358,30 +385,3 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
     def visualize_model(self):  # TODO: Does not work due to some issue with Graphviz and pydot
         keras.utils.plot_model(self._model, "model_visualization.png", show_shapes=True)
 
-    @property
-    def model(self) -> training.Model:
-        """
-        Return our Keras-trained model
-        """
-        return self._model
-
-    @property
-    def memory(self) -> Memory:
-        """
-        Return the memory for our DQN
-        """
-        return self._memory
-
-    @property
-    def policy(self) -> Policy:
-        """
-        Return our policy for our DQN
-        """
-        return self._policy
-
-    @property
-    def dqn(self) -> DQNAgent:
-        """
-        Return our DQN object
-        """
-        return self._dqn

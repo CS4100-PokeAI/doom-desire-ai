@@ -1,10 +1,10 @@
-from typing import Tuple, TypeVar
+from typing import Tuple, TypeVar, List
 
 import numpy as np
 from gym import Space
 from gym.spaces import Box
 
-from doom_desire.embed.abstract_embedder import AbstractEmbedder, AbstractFlatEmbedder
+from doom_desire.embed.abstract_embedder import AbstractEmbedder
 from poke_env.data import GEN_TO_MOVES, GEN_TO_POKEDEX
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.environment.field import Field
@@ -20,10 +20,14 @@ from poke_env.environment.weather import Weather
 
 ObservationType = TypeVar("ObservationType")
 
-
-class CustomEmbedder(AbstractFlatEmbedder):
+class CustomEmbedder(AbstractEmbedder):
+    # NOTE: This class is still abstract because it does not implement actual battle embedding
 
     def __init__(self, gen=8, priority=0):
+
+        # TODO: implement by creating priority tiers with which we should embed different aspects of the game
+        self.priority = priority
+        self.gen = gen
 
         # Store all possible game-related knowledge, so that we can can embed battle states. The tuples are key where
         # we retrieve the classes, the class, and whether poke_env supports returning the class (as opposed to string)
@@ -119,7 +123,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Flatten the arrays
         return [item for sublist in embeddings for item in sublist]
 
-    def _describe_move_embedding(self) -> Space:
+    def _describe_move_embedding(self) -> Tuple[List[float], List[float]]:
         """
         Things embedded for a 30 total
             accuracy, base power, priority (1 each, 3 total)
@@ -137,12 +141,19 @@ class CustomEmbedder(AbstractFlatEmbedder):
                          'secondary_chance': {'low': -1, 'high': 100, 'times': 1}
                          }
 
-        low_move  =  [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
-        high_move  = [sub_dict['high'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
+        low_move = [sub_dict['low'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
+        high_move = [sub_dict['high'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
         return low_move, high_move
 
-    # Returns an array of an embedded mon; could be precomputed per battle
-    def _embed_mon(self, mon: Pokemon) -> ObservationType:
+    def describe_move_embedding(self) -> Box:
+        low, high = self._describe_move_embedding()
+        return Box(
+            np.array(low, dtype=np.float32),
+            np.array(high, dtype=np.float32),
+            dtype=np.float32,
+        )
+
+    def _embed_mon_properties(self, mon: Pokemon) -> ObservationType:
         """
         Things embedded for a 172 total
             4x moves (30 each, 120 total)
@@ -152,10 +163,6 @@ class CustomEmbedder(AbstractFlatEmbedder):
             types (36 total)
         """
         embeddings = []
-
-        # Append moves to embedding (and account for the fact that the mon might have <4 moves)
-        for move in (list(mon.moves.values()) + [None, None, None, None])[:4]:
-            embeddings.append(self._embed_move(move))
 
         # Add whether the mon is active, the current hp, whether its fainted, its level,
         # its weight and whether its recharging or preparing
@@ -178,9 +185,9 @@ class CustomEmbedder(AbstractFlatEmbedder):
         embeddings.append([1 if mon.type_2 == pokemon_type else 0 for pokemon_type in self._knowledge['PokemonType']])
 
         # Flatten all the lists into a Nx1 list
-        return [item for sublist in embeddings for item in sublist]
+        return embeddings
 
-    def _describe_mon_embedding(self) -> Space:
+    def _describe_mon_properties_embedding(self) -> Tuple[List[float], List[float]]:
         """
         Things embedded for a 172 total
             4x moves (30 each, 120 total)
@@ -189,10 +196,8 @@ class CustomEmbedder(AbstractFlatEmbedder):
             status (7 total)
             types (36 total)
         """
-        low_move, high_move = self._describe_move_embedding()
 
-        low_high_dict = {'moves': {'low': low_move, 'high': high_move, 'times': 4},
-                         'active': {'low': [0], 'high': [1], 'times': 1},
+        low_high_dict = {'active': {'low': [0], 'high': [1], 'times': 1},
                          'current_hp': {'low': [0], 'high': [1000], 'times': 1},
                          'fainted': {'low': [0], 'high': [1], 'times': 1},
                          'dynamaxed': {'low': [0], 'high': [1], 'times': 1},
@@ -202,7 +207,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
                          'type2': {'low': [0], 'high': [1], 'times': 18},
                          }
 
-        low_mon  = [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
+        low_mon  = [sub_dict['low'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
         low_mon = [item for sublist in low_mon for item in sublist]
 
         high_mon = [sub_dict['high'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
@@ -210,7 +215,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         return low_mon, high_mon
 
-    def _embed_opp_mon(self, mon) -> ObservationType:
+    def _embed_opp_mon_properties(self, mon: Pokemon) -> ObservationType:
         """
         Things embedded for a 173 total
             4x moves (30 each, 120 total)
@@ -220,10 +225,6 @@ class CustomEmbedder(AbstractFlatEmbedder):
             types (36 total)
         """
         embeddings = []
-
-        # Append moves to embedding (and account for the fact that the mon might have <4 moves, or we don't know of them)
-        for move in (list(mon.moves.values()) + [None, None, None, None])[:4]:
-            embeddings.append(self._embed_move(move))
 
         # Add whether the mon is active, the current hp, whether its fainted, its level, its weight and whether its recharging or preparing
         embeddings.append([
@@ -245,9 +246,9 @@ class CustomEmbedder(AbstractFlatEmbedder):
         embeddings.append([1 if mon.type_2 == pokemon_type else 0 for pokemon_type in self._knowledge['PokemonType']])
 
         # Flatten all the lists into a Nx1 list
-        return [item for sublist in embeddings for item in sublist]
+        return embeddings
 
-    def _describe_opp_mon_embedding(self) -> Space:
+    def _describe_opp_mon_properties_embedding(self) -> Tuple[List[float], List[float]]:
         """
         Things embedded for a 173 total
             4x moves (30 each, 120 total)
@@ -256,10 +257,8 @@ class CustomEmbedder(AbstractFlatEmbedder):
             status (7 total)
             types (36 total)
         """
-        low_move, high_move = self._describe_move_embedding()
 
-        low_high_dict = {'moves': {'low': low_move, 'high': high_move, 'times': 4},
-                         'active': {'low': [0], 'high': [1], 'times': 1},
+        low_high_dict = {'active': {'low': [0], 'high': [1], 'times': 1},
                          'current_hp': {'low': [0], 'high': [1000], 'times': 1},
                          'fainted': {'low': [0], 'high': [1], 'times': 1},
                          'dynamaxed': {'low': [0], 'high': [1], 'times': 1},
@@ -269,22 +268,13 @@ class CustomEmbedder(AbstractFlatEmbedder):
                          'type2': {'low': [0], 'high': [1], 'times': 18},
                          }
 
-        low_opp_mon  = [sub_dict['low']  for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
+        low_opp_mon = [sub_dict['low'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
         low_opp_mon = [item for sublist in low_opp_mon for item in sublist]
 
         high_opp_mon = [sub_dict['high'] for sub_dict in low_high_dict.values() for _ in range(sub_dict['times'])]
         high_opp_mon = [item for sublist in high_opp_mon for item in sublist]
 
         return low_opp_mon, high_opp_mon
-
-    def embed_team(self, battle) -> ObservationType:
-        embeddings = []
-
-        # Add team to embeddings
-        for mon in battle.team.values():
-            embeddings.append(self._embed_mon(battle, mon))
-
-        return embeddings
 
     def embed_opp_team(self, battle) -> ObservationType:
         embeddings = []
@@ -332,7 +322,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
     # Embed mons (and whether they're active)
     # Embed opponent mons (and whether they're active, they've been brought or we don't know)
     # Then embed all the Fields, Side Conditions, Weathers, Player Ratings, # of Turns and the bias
-    def embed_battle(self, battle: AbstractBattle) -> ObservationType:
+    def embed_battle(self, battle) -> ObservationType:
         """
         Things embedded for a 2113 total
             player team mons (172 each, 1032 total)
@@ -346,7 +336,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         # Add team to embeddings
         for mon in battle.team.values():
-            embeddings.append(self._embed_mon(mon))
+            embeddings.append(self._embed_mon(battle, mon))
 
         # TODO: Add embedding for current mon's boosts
 
@@ -356,14 +346,14 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         for mon in battle.opponent_team.values():
             if mon.species in embedded_opp_mons: continue
-            embeddings.append(self._embed_opp_mon(mon))
+            embeddings.append(self._embed_opp_mon(battle, mon))
             embedded_opp_mons.add(mon.species)
 
         for mon in battle.teampreview_opponent_team:
             if mon in embedded_opp_mons: continue
             # handle multiple indifferentiable forms (i.e. 'urshifu' in team preview but 'urshifurapidstrike' once seen)
             if any(mon in seen_mon for seen_mon in embedded_opp_mons): continue
-            embeddings.append(self._embed_opp_mon(battle.teampreview_opponent_team[mon]))
+            embeddings.append(self._embed_opp_mon(battle, battle.teampreview_opponent_team[mon]))
             embedded_opp_mons.add(mon)
 
         # TODO: Add embedding for current opponent's mon's boosts
@@ -384,12 +374,11 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         return_embedding = np.float32([item for sublist in embeddings for item in sublist])
 
-        # used for debugging embedding
-        # if any(return_embedding[i] < self._embedding_description.low[i] for i in range(len(self._embedding_description.low))):
-        #     print("Embedding value lower than limit: \n", return_embedding, self._embedding_description.low)
-        # for i in range(len(self._embedding_description.high)):
-        #     if return_embedding[i] > self._embedding_description.high[i]:
-        #         print("Embedding value higher than limit (i=", i,") : ", return_embedding[i], " > ", self._embedding_description.high[i])
+        if any(return_embedding[i] < self._embedding_description.low[i] for i in range(len(self._embedding_description.low))):
+            print("Embedding value lower than limit: \n", return_embedding, self._embedding_description.low)
+        for i in range(len(self._embedding_description.high)):
+            if return_embedding[i] > self._embedding_description.high[i]:
+                print("Embedding value higher than limit (i=", i,") : ", return_embedding[i], " > ", self._embedding_description.high[i])
 
         return return_embedding
 
@@ -423,7 +412,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         return low_battle, high_battle
 
-    def _describe_embedding(self) -> Box:
+    def _describe_embedding(self) -> Space:
 
         low, high = self._describe_battle_embedding()
         return Box(

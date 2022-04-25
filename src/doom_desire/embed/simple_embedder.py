@@ -4,12 +4,12 @@ import numpy as np
 from gym import Space
 from gym.spaces import Box
 
-from doom_desire.embed.abstract_embedder import AbstractEmbedder
+from doom_desire.embed.abstract_embedder import AbstractFlatEmbedder
 from poke_env.environment.abstract_battle import AbstractBattle
 from poke_env.player.openai_api import ObservationType
 
 
-class SimpleEmbedder(AbstractEmbedder):
+class SimpleEmbedder(AbstractFlatEmbedder):
     """
     Simple Embedding with 10 components:
 
@@ -50,8 +50,7 @@ class SimpleEmbedder(AbstractEmbedder):
         )
         return np.float32(final_vector)
 
-
-    def describe_embedding(self) -> Space:
+    def describe_embedding(self) -> Box:
         low = [-1, -1, -1, -1, 0, 0, 0, 0, 0, 0]
         high = [3, 3, 3, 3, 4, 4, 4, 4, 1, 1]
         return Box(
@@ -59,7 +58,6 @@ class SimpleEmbedder(AbstractEmbedder):
             np.array(high, dtype=np.float32),
             dtype=np.float32,
         )
-
 
     def embedding_shape(self)-> Tuple[int, int]:
         return (1, 10)
