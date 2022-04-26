@@ -25,7 +25,7 @@ config_properties = {
     'evaluate': True,
     'cross_evaluate': False,
 
-    'embedder': 'simple_plus',
+    'embedder': 'matchup',
 
     'NB_TRAINING_STEPS': 20000,
     'NB_EVALUATION_EPISODES': 100,
@@ -43,10 +43,11 @@ config_properties = {
 
     'team': TeamRepository.teams_as_list,
     'opponent': 'combo',
-    'opponent_team': TeamRepository.teams_as_list,  # [team_1, team_2]
+    'in_order': True,
+    'opponent_team': TeamRepository.teams_as_list,
 
     'load_weights': False,
-    'weights_file': 'model_custom_600000.hdf5',  # 'model_2022_04_22_21_16_15.hdf5'  # None
+    'weights_file': 'model_custom_600000.hdf5',
     'force_save_model': False,
 }
 
@@ -179,8 +180,7 @@ async def main():
         training_opponent = set_training_opponents(config)
         training_agent.train(training_opponent,
                              num_steps=config.NB_TRAINING_STEPS,
-                             in_order=True)
-        # training_agent.done()
+                             in_order=config.in_order)
 
     if config.evaluate:
         evaluate_trained_agent(config, trained_agent=training_agent)
