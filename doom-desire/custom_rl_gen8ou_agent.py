@@ -17,29 +17,10 @@ from doom_desire.player.custom_player import CustomRLPlayer
 from poke_env.player.baselines import MaxBasePowerPlayer, SimpleHeuristicsPlayer
 from poke_env.player.random_player import RandomPlayer
 
-# Defaults taken from reuniclusVGC
-# config_defaults = {
-#     'NB_TRAINING_STEPS': 10000,
-#     'NB_EVALUATION_EPISODES': 100,
-#     'first_layer_nodes': 500,
-#     'second_layer_nodes': 500,
-#     'third_layer_nodes': -1,
-#     'gamma': .99,
-#     'delta_clip': .9,
-#     'target_model_update': 10,
-#     'lr': .001,
-#     'memory_limit': 100000,
-#     'warmup_steps': 500,
-#     'activation': "relu",
-#     'policy': 'EpsGreedyQPolicy',
-#     'team': 'swampert',
-#     'opponent': 'max',
-#     'opponent_team': 'swampert'
-# }
 from poke_env.player.utils import background_evaluate_player, background_cross_evaluate
 from poke_env.teambuilder.teambuilder import Teambuilder
 
-config_defaults = {
+config_properties = {
     'train': True,
     'evaluate': True,
     'cross_evaluate': False,
@@ -59,6 +40,7 @@ config_defaults = {
     'warmup_steps': 1000,  # 1000      or 500
     'activation': "relu",  # "elu"     or "relu"
     'policy': 'EpsGreedyQPolicy',
+
     'team': TeamRepository.teams_as_list,
     'opponent': 'combo',
     'opponent_team': TeamRepository.teams_as_list,  # [team_1, team_2]
@@ -176,7 +158,7 @@ async def cross_evaluate_trained_agent(config, trained_agent: CustomRLPlayer):
 
 async def main():
     # Initialize a new wandb run; We can use os.environ['WANDB_MODE'] = 'dryrun' to not save wandb to cloud
-    wandb.init(config=config_defaults, entity="jfenton888", project="doom-desire-ai_DQN")
+    wandb.init(config=config_properties, entity="jfenton888", project="doom-desire-ai_DQN")
     config = wandb.config
 
     # Create one environment for both training and evaluation
