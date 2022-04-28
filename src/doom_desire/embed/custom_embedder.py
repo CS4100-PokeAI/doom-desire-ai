@@ -119,7 +119,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Flatten the arrays
         return [item for sublist in embeddings for item in sublist]
 
-    def _describe_move_embedding(self) -> Space:
+    def _describe_move_embedding(self):
         """
         Things embedded for a 30 total
             accuracy, base power, priority (1 each, 3 total)
@@ -180,7 +180,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Flatten all the lists into a Nx1 list
         return [item for sublist in embeddings for item in sublist]
 
-    def _describe_mon_embedding(self) -> Space:
+    def _describe_mon_embedding(self):
         """
         Things embedded for a 172 total
             4x moves (30 each, 120 total)
@@ -247,7 +247,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
         # Flatten all the lists into a Nx1 list
         return [item for sublist in embeddings for item in sublist]
 
-    def _describe_opp_mon_embedding(self) -> Space:
+    def _describe_opp_mon_embedding(self):
         """
         Things embedded for a 173 total
             4x moves (30 each, 120 total)
@@ -282,7 +282,7 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         # Add team to embeddings
         for mon in battle.team.values():
-            embeddings.append(self._embed_mon(battle, mon))
+            embeddings.append(self._embed_mon(mon))
 
         return embeddings
 
@@ -293,14 +293,14 @@ class CustomEmbedder(AbstractFlatEmbedder):
 
         for mon in battle.opponent_team.values():
             if mon.species in embedded_opp_mons: continue
-            embeddings.append(self._embed_opp_mon(battle, mon))
+            embeddings.append(self._embed_opp_mon(mon))
             embedded_opp_mons.add(mon.species)
 
         for mon in battle.teampreview_opponent_team:
             if mon in embedded_opp_mons: continue
             # handle multiple indifferentiable forms (i.e. 'urshifu' in team preview but 'urshifurapidstrike' once seen)
             if any(mon in seen_mon for seen_mon in embedded_opp_mons): continue
-            embeddings.append(self._embed_opp_mon(battle, battle.teampreview_opponent_team[mon]))
+            embeddings.append(self._embed_opp_mon(battle.teampreview_opponent_team[mon]))
             embedded_opp_mons.add(mon)
 
         return embeddings
