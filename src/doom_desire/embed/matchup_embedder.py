@@ -51,8 +51,17 @@ class MatchupEmbedder(AbstractFlatEmbedder):
         # -1 indicates that the move does not have a base power
         # or is not available
 
+        active = battle.active_pokemon
+        active_opponent = battle.opponent_active_pokemon
+
+        matchup_estimates = []
+        matchup_estimates.append(self._estimate_matchup(active, active_opponent))
+
         embedded_opp_mons = set()
         opponent_team = []
+
+        embedded_opp_mons.add(active_opponent.species)
+
         for mon in battle.opponent_team.values():
             if mon.species in embedded_opp_mons: continue
             opponent_team.append(mon)
@@ -63,20 +72,16 @@ class MatchupEmbedder(AbstractFlatEmbedder):
             if any(mon in seen_mon for seen_mon in embedded_opp_mons): continue
             opponent_team.append(battle.teampreview_opponent_team[mon])
 
-        matchup_estimates = []
-        for player_mon in battle.team.values():  # Should be the 36 matchup estimates (doesn't include moves)
-            for opponent_mon in opponent_team:
-                matchup_estimates.append(self._estimate_matchup(player_mon, opponent_mon))
-        if len(matchup_estimates) is not 36:
-            print("ISSUE: Don't have all matchups")
+        for opponent_mon in opponent_team:
+             matchup_estimates.append(self._estimate_matchup(active, opponent_mon))
+
+        for player_mon in battle.team.values():
+            matchup_estimates.append(self._estimate_matchup(player_mon, active_opponent))
 
         # For moves, embed base power, damage multiplier, and physicial-special ratio for current mons
-        active = battle.active_pokemon
-        opponent = battle.opponent_active_pokemon
-
         physical_special_ratio = [
-            self._stat_estimation(active, "atk") / self._stat_estimation(opponent, "def"),  # physical_ratio
-            self._stat_estimation(active, "spa") / self._stat_estimation(opponent, "spd")]  # special_ratio
+            self._stat_estimation(active, "atk") / self._stat_estimation(active_opponent, "def"),  # physical_ratio
+            self._stat_estimation(active, "spa") / self._stat_estimation(active_opponent, "spd")]  # special_ratio
 
         # -1 indicates that the move does not have a base power
         # or is not available
@@ -118,7 +123,7 @@ class MatchupEmbedder(AbstractFlatEmbedder):
             status (7 total)
             types (36 total)
         """
-        low_high_dict = {'matchup_estimate': {'low': [-2], 'high': [2], 'times': 36},
+        low_high_dict = {'matchup_estimate': {'low': [-2], 'high': [2], 'times': 12},
                          'ph_sp_ratio': {'low': [0], 'high': [2], 'times': 2},
                          'move_power': {'low': [-1], 'high': [3], 'times': 4},
                          'dmg_multi': {'low': [0], 'high': [4], 'times': 4},
@@ -138,4 +143,5 @@ class MatchupEmbedder(AbstractFlatEmbedder):
         )
 
     def embedding_shape(self)-> Tuple[int, int]:
-        return (1, 48)
+        return (1, 24)
+
