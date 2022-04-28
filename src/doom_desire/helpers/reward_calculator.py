@@ -115,3 +115,19 @@ class RewardCalculator():
     @property
     def starting_value(self):
         return self._starting_value
+
+# This is the reward calculating values from the poke-env defaults
+ExampleRewardCalculator = RewardCalculator(victory_value=30,
+                                           starting_value=0,
+                                           fainted_value=2,
+                                           hp_value=1,
+                                           status_value=0,
+                                           matchup_advantage_value=0)
+
+CustomRewardCalculator = RewardCalculator(victory_value=1000.0,
+                                          starting_value=0.0,
+                                          fainted_value=10.0,
+                                          hp_value=5.0,
+                                          number_of_pokemons= 6,
+                                          status_value=1.0,
+                                          matchup_advantage_value=3.0)
