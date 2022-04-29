@@ -25,19 +25,19 @@ from poke_env.teambuilder.teambuilder import Teambuilder
 run_config_dict = {
     'train': True,
     'evaluate': True,
-    'cross_evaluate': False,
+    'cross_evaluate': True,
     'evaluation_battles': 100,
 
     'embedder': 'matchup',
     'reward_calculator': 'example',
 
-    'team': TeamRepository.teams_as_list,
+    'team': TeamRepository.ou_teams_as_list,
     'opponent': 'rand',
     'in_order': True,
-    'opponent_team': TeamRepository.teams_as_list,
+    'opponent_team': TeamRepository.ou_teams_as_list,
 
-    'load_weights': True,
-    'weights_file': 'model_matchup_500k_rand.hdf5',
+    'load_weights': False,
+    'weights_file': 'model_matchup_rand200k.hdf5',
     'force_save_model': True,
 }
 run_config = SimpleNamespace(**run_config_dict)
@@ -176,8 +176,9 @@ async def cross_evaluate_trained_agent(config, trained_agent: CustomRLPlayer):
 
 async def main():
     # Initialize a new wandb run; We can use os.environ['WANDB_MODE'] = 'dryrun' to not save wandb to cloud
-    wandb.init(config=model_config_dict, entity="jfenton888", project="doom-desire-ai_DQN")
-    config = wandb.config
+    if run_config.train:
+        wandb.init(config=model_config_dict, entity="jfenton888", project="doom-desire-ai_DQN")
+        config = wandb.config
 
     # Create one environment for both training and evaluation
     player_teams = RandomTeamFromPool(run_config.team)
@@ -201,7 +202,7 @@ async def main():
         # Train the agent against the opponent for num_steps
         training_opponent = set_training_opponents(run_config)
         training_agent.train(training_opponent,
-                             num_steps=config.NB_TRAINING_STEPS,
+                             num_steps=model_config.NB_TRAINING_STEPS,
                              in_order=run_config.in_order)
 
     if run_config.evaluate:

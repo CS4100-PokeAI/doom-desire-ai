@@ -1,5 +1,5 @@
 class TeamRepository:
-    teams = {
+    ou_teams = {
         "lapras": """
 GI Jaim 2 (Lapras) @ Leftovers  
 Ability: Water Absorb  
@@ -459,4 +459,4 @@ IVs: 30 Spe
 """,
     }
 
-    teams_as_list = list(teams.values())
+    ou_teams_as_list = list(ou_teams.values())
