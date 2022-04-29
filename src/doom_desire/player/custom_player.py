@@ -63,6 +63,8 @@ class CustomRLPlayer(Gen8EnvSinglePlayer):
             start_challenging=start_challenging,
         )
 
+        self._ACTION_SPACE = list(range(4 + 6))
+
     def _create_model(self):
 
         self._model, self._policy, self._memory, self._dqn = self._battle_modeler.build_model(self.action_space_size())
