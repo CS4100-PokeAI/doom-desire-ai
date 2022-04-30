@@ -1,5 +1,7 @@
 # CS4100: PokeAI
 
+Main script can be found in [doom-desire-ai/doom-desire/custom_rl_gen8ou_agent.py](https://github.com/CS4100-PokeAI/doom-desire-ai/blob/development/doom-desire/custom_rl_gen8ou_agent.py)
+
 # Onboarding
 
 Getting Familiar with The Problem
