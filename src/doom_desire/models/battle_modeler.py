@@ -58,6 +58,7 @@ class SequentialBattleModeler(AbstractBattleModeler):
 
         # Flattening resolve potential issues that would arise otherwise
         self._model.add(Flatten())
+
         if self._config.second_layer_nodes > 0:
             self._model.add(Dense(self._config.second_layer_nodes,  # 64
                                   activation=self._config.activation))  # 'elu'
