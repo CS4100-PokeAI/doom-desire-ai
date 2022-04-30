@@ -1,31 +1,5 @@
 # CS4100: PokeAI
 
-# TODO
-
-- [Onboarding](#onboarding)
-- Pick a format 
-  - not sure if I still love the idea of random battles because opponents back mons are hidden
-- starting to like the idea of doing VGC (official pokemon format where you pick 4 of the 6 from your team for a double battle)
-  - Singles battles often last 30 turns while VGC rarely get to 10 (often 6ish) (so less depth), but the action space becomes much bigger with 4 on the field at once (so branching factor increases dramatically)
-  - Have reached out to [WolfeyVGC](https://www.youtube.com/c/WolfeyVGC) for help on a "rules based" flowchart following bot
-- Sample [teams](#pokemon-resources) for VGC if thats what we're doing
-- How do we train using the complete games from Smogon logs?
-  - How do we remove certain conditions we don't want to worry about in our scenario? (like tossing any games with ditto)
-- Is there a way to weight the training by the ELO of the player (low ELO shows generally how people play but play like high ELO who make better decisions)
-- Can we make a "perfect information" bot that always knows opponents sets
-- Can we take advantage of usage stats to predict what an opponent will have in terms of sets? (and do we use those predictions as further features)
-  - like at team preview we can narrow down what each mon likely has based on team composition
-- What other assumptions or guesses can we make to help the RL (and what might be over complicating it) like only checking min, max, and average damage rolls instead of all 16 (or maybe identifying "break points")
-- Look into the possibility of using different models for different phases of the game
-  - One for determining how to lead and maybe first turn (like for the Coalossal team that has set leads that are easily defineable), which would give time to initialize a model for the RL during the remainder of the time in team preview
-  - Reinforcement Learning model for main chunk of the game
-  - Some players noted that the AI did badly in the end game so possibly once a near win condition has been met let something else take over that plays towards that win condition
-- In training TheThirdBuild used each individual turn as their own episode and just used whether or not they won at the end of the game as the reward
-  - I like this approach in general but we can do better than just whether or not it was a win: points for guarenteed win condition (on last turn but possibly further back), possibly discount based on the number of high variance moves used (i.e. winning based on a last turn crit is not good)
-  - Maybe include the last 2 turns in this (or maybe use that greedy playout model to find the reward)
-  - A reward only has to be calculated once for the entire game (or maybe the discounting happens based on the variance in that particular turn)
-- Make the reward a function of the probability of the event(s) that let to the win (i.e. winning on a 70% accurate move could give only 70% of the reward that you would get from doing it with 100%)
-
 # Onboarding
 
 Getting Familiar with The Problem
@@ -75,7 +49,7 @@ and its [article](https://remptongames.com/2021/06/27/programming-ai-for-pokemon
 ### Academic Papers
 
 - [Showdown AI competition](https://ieeexplore.ieee.org/document/8080435)
-- [A Self-Play Policy Optimization Approach to Battling Pokémon](https://ieeexplore.ieee.org/document/8848014)
+- [Metagrok](#metagrok) has very good paper and public repository
 - [Competitive Deep Reinforcement Learning over a Pokémon Battling Simulator](https://ieeexplore.ieee.org/document/9096092)
 - [VGC AI Competition - A New Model of Meta-Game Balance AI Competition](https://ieeexplore.ieee.org/document/9618985)
 - [The 2016 Two-Player GVGAI Competition](https://ieeexplore.ieee.org/document/8100955) (not actually about pokemon)
@@ -208,6 +182,17 @@ written in JavaScript for Node
 - [Github](https://github.com/DeathlyPlays/Pokemon-Showdown-Bot)
 
 ---
+
+#### Metagrok
+
+Very important for furutre work, has really good paper
+
+- [Github](https://github.com/yuzeh/metagrok)
+- [Paper](https://www.yuzeh.com/assets/CoG-2019-Pkmn.pdf)
+
+
+----
+
 
 ## Pokemon Resources
 
